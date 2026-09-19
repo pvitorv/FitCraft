@@ -10,7 +10,7 @@ import {
 } from "../models/Playlist.js";
 import { deleteTrack, importTracks, listTracks, moveTrack } from "../models/Track.js";
 import { go } from "../routes.js";
-import { isAbortError, pickCycleFile, applyPlaylistPack, readPlaylistPackFromFile } from "../lib/playlistPack.js";
+import { applyPlaylistArchive, isAbortError, pickPlaylistFile, readPlaylistArchiveFromFile } from "../lib/playlistPack.js";
 import { shareOrSavePlaylist } from "../services/shareCycle.js";
 import {
   nextTrack,
@@ -93,7 +93,7 @@ async function playlistHome() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Playlist local</div>
         <h2>Summer Eletrohits no aparelho.</h2>
-        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém. Enviar manda o arquivo da lista (só os nomes das faixas, nunca o áudio) pelo WhatsApp, Telegram, e-mail ou Drive.</p>
+        <p>Importe as músicas que você já tem. Enviar empacota o áudio num arquivo e abre o WhatsApp, Telegram, e-mail ou Drive. Quem aperta enviar é você.</p>
         <div class="cta-row">
           <button class="btn btn-ghost" type="button" id="import-playlist">${icons.share} Receber playlist</button>
         </div>
@@ -140,12 +140,10 @@ async function playlistHome() {
       });
       root.querySelector("#import-playlist")?.addEventListener("click", async () => {
         try {
-          const file = await pickCycleFile();
-          const pack = await readPlaylistPackFromFile(file);
-          const created = applyPlaylistPack(pack);
-          alert(
-            `Playlist “${created.name}” chegou com ${pack.playlist.tracks.length} nomes. Importe os arquivos de áudio que você já tem — o FitCraft não envia música.`,
-          );
+          const file = await pickPlaylistFile();
+          const pack = await readPlaylistArchiveFromFile(file);
+          const created = await applyPlaylistArchive(pack);
+          alert(`Playlist “${created.name}” chegou com o áudio.`);
           go(`/playlist/${created.id}`);
         } catch (error) {
           if (isAbortError(error)) return;
@@ -254,7 +252,7 @@ async function playlistDetail(id) {
         try {
           const result = await shareOrSavePlaylist(playlist.id);
           if (result === "downloaded") {
-            alert("Arquivo salvo no PC. No celular o Enviar abre o WhatsApp com a lista de nomes, sem o áudio.");
+            alert("Arquivo salvo no PC. No celular o Enviar abre o WhatsApp com o áudio da playlist.");
           }
         } catch (error) {
           if (isAbortError(error)) return;

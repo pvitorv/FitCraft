@@ -1,4 +1,4 @@
-import { all, deleteAudio, get, putAudio, run } from "../database/connection.js";
+import { all, deleteAudio, get, lastId, putAudio, run } from "../database/connection.js";
 import { MAX_TRACKS } from "./Playlist.js";
 
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -82,30 +82,41 @@ export async function importTracks(playlistId, fileList) {
   }
 }
 
-export function addPlaceholderTracks(playlistId, items) {
+export async function addPackedTrack(playlistId, item) {
   const current = listTracks(playlistId);
-  const room = MAX_TRACKS - current.length;
-  if (room <= 0) {
+  if (current.length >= MAX_TRACKS) {
     throw new Error("Esta playlist já tem 15 faixas.");
   }
 
-  let nextOrder = get(
+  const blob = item.blob;
+  if (!blob || !blob.size) {
+    throw new Error(`A faixa “${item.name || "Faixa"}” veio sem o áudio.`);
+  }
+  if (blob.size > MAX_BYTES) {
+    throw new Error(`A faixa “${item.name || "Faixa"}” passa de 20 MB.`);
+  }
+
+  const nextOrder = get(
     "SELECT COALESCE(MAX(sort_order), -1) + 1 AS next FROM tracks WHERE playlist_id = ?",
     [playlistId],
   ).next;
-
-  items.slice(0, room).forEach((item) => {
-    const name = String(item.name || "Faixa").trim().slice(0, 80) || "Faixa";
-    const key = `pending-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    run(
-      `
-        INSERT INTO tracks (playlist_id, name, mime, duration_seconds, file_key, sort_order)
-        VALUES (?, ?, 'audio/mpeg', ?, ?, ?)
-      `,
-      [playlistId, name, Math.max(0, Math.round(Number(item.durationSeconds) || 0)), key, nextOrder],
-    );
-    nextOrder += 1;
-  });
+  const key = `audio-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  await putAudio(key, blob);
+  run(
+    `
+      INSERT INTO tracks (playlist_id, name, mime, duration_seconds, file_key, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `,
+    [
+      playlistId,
+      String(item.name || "Faixa").trim().slice(0, 80) || "Faixa",
+      item.mime || blob.type || "audio/mpeg",
+      Math.max(0, Math.round(Number(item.durationSeconds) || 0)),
+      key,
+      nextOrder,
+    ],
+  );
+  return findTrack(lastId());
 }
 
 export function isPendingTrack(track) {

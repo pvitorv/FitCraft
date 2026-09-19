@@ -95,6 +95,7 @@ if (!manifest.includes("fitcraft-file")) {
                 <data android:scheme="file" />
                 <data android:mimeType="application/json" />
                 <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/zip" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
@@ -102,6 +103,7 @@ if (!manifest.includes("fitcraft-file")) {
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/json" />
                 <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/zip" />
                 <data android:mimeType="text/plain" />
             </intent-filter>` +
       manifest.slice(insertAt);

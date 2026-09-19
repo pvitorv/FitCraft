@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 024 — arquivo que o WhatsApp realmente anexa</p>
+            <p class="muted">FitCraft 025 — playlist vai com o áudio</p>
           </div>
-          <strong>024</strong>
+          <strong>025</strong>
         </div>
       </div>
     `,

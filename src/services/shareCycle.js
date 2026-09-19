@@ -1,11 +1,18 @@
 import { Capacitor } from "@capacitor/core";
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
+import { uint8ToBase64 } from "../lib/bytes.js";
 import { buildCyclePack, fileNameForPack, stringifyCyclePack } from "../lib/cyclePack.js";
-import { buildPlaylistPack, fileNameForPlaylistPack } from "../lib/playlistPack.js";
+import { buildPlaylistArchive } from "../lib/playlistPack.js";
 
-function downloadText(name, body) {
-  const blob = new Blob([body], { type: "application/json" });
+function fileUrlFromUri(uri) {
+  if (!uri) return "";
+  if (uri.startsWith("file:")) return uri;
+  if (uri.startsWith("/")) return `file://${uri}`;
+  return `file://${uri}`;
+}
+
+function downloadBlob(name, blob) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -17,70 +24,67 @@ function downloadText(name, body) {
   window.setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-function fileUrlFromUri(uri) {
-  if (!uri) return "";
-  if (uri.startsWith("file:")) return uri;
-  if (uri.startsWith("/")) return `file://${uri}`;
-  return `file://${uri}`;
+async function shareNativeFile(name, data, dialogTitle, encoding) {
+  await Filesystem.writeFile({
+    path: name,
+    data,
+    directory: Directory.Cache,
+    ...(encoding ? { encoding } : {}),
+  });
+  const { uri } = await Filesystem.getUri({
+    path: name,
+    directory: Directory.Cache,
+  });
+  await Share.share({
+    files: [fileUrlFromUri(uri)],
+    dialogTitle,
+  });
 }
 
-async function shareWebFile(name, body, title) {
-  const file = new File([body], name, { type: "application/json" });
-  if (!navigator.canShare?.({ files: [file] })) {
-    return false;
-  }
-  await navigator.share({
-    files: [file],
-    title,
-  });
+async function shareWebFile(file) {
+  if (!navigator.canShare?.({ files: [file] })) return false;
+  await navigator.share({ files: [file] });
   return true;
 }
 
-export async function shareOrSaveText(name, body, title, dialogTitle = "Enviar FitCraft") {
+export async function shareOrSaveText(name, body, _title, dialogTitle = "Enviar FitCraft") {
   if (Capacitor.isNativePlatform()) {
-    await Filesystem.writeFile({
-      path: name,
-      data: body,
-      directory: Directory.Cache,
-      encoding: Encoding.UTF8,
-    });
-    const { uri } = await Filesystem.getUri({
-      path: name,
-      directory: Directory.Cache,
-    });
-    await Share.share({
-      files: [fileUrlFromUri(uri)],
-      dialogTitle,
-    });
+    await shareNativeFile(name, body, dialogTitle, Encoding.UTF8);
     return "shared";
   }
 
+  const file = new File([body], name, { type: "application/json" });
   try {
-    if (await shareWebFile(name, body, title)) {
-      return "shared";
-    }
+    if (await shareWebFile(file)) return "shared";
   } catch (error) {
-    if (error?.name === "AbortError") {
-      throw error;
-    }
+    if (error?.name === "AbortError") throw error;
+  }
+  downloadBlob(name, new Blob([body], { type: "application/json" }));
+  return "downloaded";
+}
+
+export async function shareOrSaveBytes(name, bytes, mime, dialogTitle = "Enviar FitCraft") {
+  if (Capacitor.isNativePlatform()) {
+    await shareNativeFile(name, uint8ToBase64(bytes), dialogTitle);
+    return "shared";
   }
 
-  downloadText(name, body);
+  const file = new File([bytes], name, { type: mime || "application/octet-stream" });
+  try {
+    if (await shareWebFile(file)) return "shared";
+  } catch (error) {
+    if (error?.name === "AbortError") throw error;
+  }
+  downloadBlob(name, new Blob([bytes], { type: mime || "application/octet-stream" }));
   return "downloaded";
 }
 
 export async function shareOrSaveCycle(cycleId) {
   const pack = buildCyclePack(cycleId);
-  const body = stringifyCyclePack(pack);
-  const name = fileNameForPack(pack);
-  const title = `Ciclo FitCraft: ${pack.cycle.name}`;
-  return shareOrSaveText(name, body, title, "Enviar ciclo .fitcraft");
+  return shareOrSaveText(fileNameForPack(pack), stringifyCyclePack(pack), pack.cycle.name, "Enviar ciclo FitCraft");
 }
 
 export async function shareOrSavePlaylist(playlistId) {
-  const pack = buildPlaylistPack(playlistId);
-  const body = `${JSON.stringify(pack, null, 2)}\n`;
-  const name = fileNameForPlaylistPack(pack);
-  const title = `Playlist FitCraft: ${pack.playlist.name}`;
-  return shareOrSaveText(name, body, title, "Enviar playlist .fitcraft");
+  const archive = await buildPlaylistArchive(playlistId);
+  return shareOrSaveBytes(archive.name, archive.bytes, archive.mime, "Enviar playlist FitCraft");
 }
