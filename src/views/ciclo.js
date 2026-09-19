@@ -54,7 +54,7 @@ export async function cicloScreen({ id, cycleId }) {
           <span class="sr-only">Nome do ciclo</span>
           <input id="cycle-name" maxlength="32" value="${escapeHtml(cycle.name)}" />
         </label>
-        <p>Preparação e intervalo valem para o dia todo. A sequência de exercícios se repete quantas vezes você quiser.</p>
+        <p>A preparação acontece uma vez, só no começo. Depois o circuito é só treino e intervalo, quantas séries você marcar.</p>
         <p class="muted">Duração estimada: <strong>${formatClock(total)}</strong>${rounds > 1 ? ` · ${rounds} séries` : ""}</p>
       </article>
 
@@ -62,7 +62,7 @@ export async function cicloScreen({ id, cycleId }) {
         <div>
           <small>Repetições da sequência</small>
           <strong>Quantas vezes o circuito roda</strong>
-          <p class="muted">Burpee → intervalo → Mountain → intervalo → … e recomeça. Entre o último e o primeiro de novo também tem intervalo.</p>
+          <p class="muted">Depois da preparação: treino → intervalo → treino → intervalo… Sem voltar à preparação no fim da série.</p>
         </div>
         ${stepper("rounds", rounds, "", "count")}
       </article>
@@ -76,7 +76,7 @@ export async function cicloScreen({ id, cycleId }) {
         <article class="card phase-train">
           <small>Treino</small>
           <strong>Por exercício</strong>
-          <p>Ajuste o tempo vermelho em cada movimento abaixo.</p>
+          <p>Cada movimento tem o próprio tempo. A preparação não se repete.</p>
         </article>
         <article class="card phase-rest">
           <small>Intervalo</small>

@@ -45,13 +45,18 @@ export function buildPhases(cycle, exercises) {
         seconds: cycle.rest_seconds,
         title: next.name,
         hint: lastExercise
-          ? `Descanso. Em seguida começa a série ${round + 2}.`
-          : "Descanse. Em seguida vem este exercício.",
+          ? `Intervalo. Sem preparação de novo. A série ${round + 2} começa com ${next.name}.`
+          : "Intervalo. Em seguida vem este exercício.",
         exerciseIndex: index,
         round: round + 1,
         rounds,
       });
     });
+  }
+
+  const prepCount = phases.filter((phase) => phase.type === "prep").length;
+  if (prepCount !== 1) {
+    throw new Error("Preparação deve existir uma única vez, só no início.");
   }
 
   return phases;

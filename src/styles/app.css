@@ -48,6 +48,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   background:
     radial-gradient(1100px 480px at 8% -12%, rgba(255, 212, 0, 0.22), transparent 52%),
     radial-gradient(900px 420px at 108% 0%, rgba(255, 26, 26, 0.2), transparent 48%),
@@ -76,6 +78,9 @@ button {
   height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 .topbar {
@@ -135,7 +140,9 @@ button {
 
 .screen {
   overflow: auto;
-  padding: 8px 20px calc(var(--nav-h) + 16px);
+  overflow-x: clip;
+  min-width: 0;
+  padding: 8px 16px calc(var(--nav-h) + 16px);
 }
 
 .hero {
@@ -144,8 +151,9 @@ button {
     var(--surface);
   border: 1px solid var(--line);
   border-radius: 28px;
-  padding: 22px;
+  padding: 16px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+  min-width: 0;
 }
 
 .kicker {
@@ -235,8 +243,12 @@ button {
   margin-top: 16px;
 }
 
+.grid {
+  min-width: 0;
+}
+
 .grid.cols-3 {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
 }
 
 .card {
@@ -244,6 +256,8 @@ button {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 16px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .card.phase-prep {
@@ -327,9 +341,9 @@ button {
 
 .timer-toolbar {
   display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
 }
 
 .timer-stage,
@@ -357,8 +371,9 @@ button {
 
 .clock {
   margin: 18px 0 6px;
+  max-width: 100%;
   font-family: Outfit, sans-serif;
-  font-size: clamp(4.4rem, 18vw, 6rem);
+  font-size: clamp(2.8rem, 16vw, 6rem);
   font-weight: 800;
   letter-spacing: -0.07em;
   line-height: 0.85;
@@ -486,10 +501,15 @@ button {
 
 .controls {
   display: grid;
-  grid-template-columns: 1fr 1.3fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   width: 100%;
   margin-top: auto;
+}
+
+.controls [data-main] {
+  grid-column: 1 / -1;
+  order: -1;
 }
 
 .controls .btn {
@@ -659,8 +679,10 @@ button.row {
 }
 
 .plan-title-field input {
+  width: 100%;
+  min-width: 0;
   font-family: Outfit, "Segoe UI", sans-serif;
-  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-size: clamp(1.4rem, 7vw, 2.2rem);
   font-weight: 800;
   letter-spacing: -0.04em;
   background: transparent;
@@ -679,12 +701,13 @@ button.row {
   position: relative;
   display: grid;
   gap: 4px;
-  padding: 16px 10px;
+  padding: 12px 6px;
   border-radius: 20px;
   border: 1px solid var(--line);
   background: var(--surface);
   text-align: center;
   cursor: pointer;
+  min-width: 0;
 }
 
 .choice input {
@@ -695,7 +718,7 @@ button.row {
 
 .choice strong {
   font-family: Outfit, sans-serif;
-  font-size: 1.8rem;
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
 }
 
 .choice span {
@@ -773,8 +796,8 @@ button.row {
 .rounds-card {
   margin-top: 16px;
   display: grid;
-  grid-template-columns: 1fr minmax(150px, 180px);
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   align-items: center;
   border-color: var(--yellow);
   background: var(--yellow-dim);
@@ -788,14 +811,9 @@ button.row {
   margin: 6px 0 0;
 }
 
-@media (max-width: 699px) {
-  .rounds-card {
-    grid-template-columns: 1fr;
-  }
-}
-
 .section-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -864,7 +882,7 @@ button.row {
 
 .exercise-meta {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   gap: 10px;
   align-items: center;
   margin-top: 10px;
@@ -916,6 +934,39 @@ button.row {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@media (min-width: 720px) {
+  .hero {
+    padding: 22px;
+  }
+
+  .grid.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .timer-toolbar {
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+  }
+
+  .controls {
+    grid-template-columns: 1fr 1.3fr 1fr;
+  }
+
+  .controls [data-main] {
+    grid-column: auto;
+    order: 0;
+  }
+
+  .exercise-meta {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rounds-card {
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 180px);
+  }
 }
 
 @media (min-width: 900px) {
