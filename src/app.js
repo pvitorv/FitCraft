@@ -6,6 +6,8 @@ import { bindNavigation, renderShell } from "./views/layout.js";
 import { homeScreen } from "./views/home.js";
 import { cicloScreen } from "./views/ciclo.js";
 import { planoNovoScreen, planoScreen, planosScreen } from "./views/planos.js";
+import { timerEngine } from "./services/timerEngine.js";
+import { releaseAwake } from "./services/wakeLock.js";
 import { treinoScreen } from "./views/treino.js";
 import { playlistScreen } from "./views/playlist.js";
 import { ajustesScreen } from "./views/ajustes.js";
@@ -24,6 +26,10 @@ const screens = {
 async function render() {
   const root = document.querySelector("#app");
   const route = parseRoute();
+  if (route.name !== "treino") {
+    timerEngine.leave();
+    releaseAwake();
+  }
   const screen = screens[route.name] ?? homeScreen;
   const { html, bind } = await screen(route.params);
   root.innerHTML = renderShell(html);

@@ -13,8 +13,18 @@ export function parseRoute() {
     return {
       name: STATIC[hash],
       path: hash,
-      nav: hash.startsWith("/planos") ? "/planos" : hash,
+      nav: hash.startsWith("/planos") ? "/planos" : hash.startsWith("/treino") ? "/treino" : hash,
       params: {},
+    };
+  }
+
+  const treinoMatch = hash.match(/^\/treino\/(\d+)$/);
+  if (treinoMatch) {
+    return {
+      name: "treino",
+      path: hash,
+      nav: "/treino",
+      params: { cycleId: Number(treinoMatch[1]) },
     };
   }
 

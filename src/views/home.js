@@ -2,23 +2,25 @@ import { daysLabel } from "../lib/cycleNames.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { formatClock } from "../lib/time.js";
-import { firstCycle } from "../models/Cycle.js";
+import { firstCycle, firstTrainableCycle } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
 
 export async function homeScreen() {
   const plan = getActivePlan();
   const cycle = plan ? firstCycle(plan.id) : null;
+  const trainable = plan ? firstTrainableCycle(plan.id) : null;
   const exercises = cycle ? listExercises(cycle.id) : [];
   const first = exercises[0] ?? null;
   const second = exercises[1] ?? null;
+  const canTrain = Boolean(trainable && listExercises(trainable.id).length);
 
   return {
     html: `
       <section class="layout-split">
         <div>
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 004</div>
+            <div class="kicker"><span class="dot"></span> Versão 005</div>
             <h2>Seu cronômetro de treino metabólico.</h2>
             <p>${
               plan
@@ -26,7 +28,9 @@ export async function homeScreen() {
                 : "Crie um plano de 7, 15 ou 30 ciclos. Os dados ficam no SQLite deste aparelho."
             }</p>
             <div class="cta-row">
-              <button class="btn btn-primary" disabled>Treinar hoje</button>
+              <button class="btn btn-primary" ${canTrain ? `data-go="/treino/${trainable.id}"` : "disabled"}>
+                Treinar hoje
+              </button>
               <button class="btn btn-ghost" data-go="${plan ? `/planos/${plan.id}` : "/planos/novo"}">
                 ${plan ? "Abrir plano" : "Criar plano"}
               </button>

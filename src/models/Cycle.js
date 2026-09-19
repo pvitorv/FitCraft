@@ -22,6 +22,12 @@ export function firstCycle(planId) {
   );
 }
 
+export function firstTrainableCycle(planId) {
+  return (
+    listCycles(planId).find((cycle) => cycle.exercise_count > 0) ?? firstCycle(planId)
+  );
+}
+
 export function findCycle(id) {
   return get(
     `

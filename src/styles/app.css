@@ -320,6 +320,19 @@ button {
   font-size: 1.25rem;
 }
 
+.timer-wrap {
+  display: grid;
+  gap: 14px;
+}
+
+.timer-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.timer-stage,
 .timer-preview {
   margin-top: 12px;
   min-height: 360px;
@@ -380,6 +393,95 @@ button {
   position: relative;
   z-index: 1;
   text-align: center;
+}
+
+.timer-stage .clock {
+  margin: 0;
+  font-size: clamp(2.6rem, 11vw, 3.6rem);
+}
+
+.timer-stage.is-prep {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 212, 0, 0.36), transparent 46%),
+    #0e0e10;
+}
+
+.timer-stage.is-prep .phase-label {
+  color: var(--yellow);
+}
+
+.timer-stage.is-work {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 26, 26, 0.34), transparent 46%),
+    #0e0e10;
+}
+
+.timer-stage.is-work .phase-label {
+  color: var(--red);
+}
+
+.timer-stage.is-rest {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(31, 92, 255, 0.36), transparent 46%),
+    #0e0e10;
+}
+
+.timer-stage.is-rest .phase-label {
+  color: #6b93ff;
+}
+
+.timer-stage.is-done {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(52, 211, 153, 0.28), transparent 46%),
+    #0e0e10;
+}
+
+.timer-stage.is-done .phase-label {
+  color: var(--ok);
+}
+
+.timer-stage.is-paused.is-running {
+  outline: 0;
+}
+
+.timer-stage.is-paused:not(.is-done) .clock {
+  opacity: 0.72;
+}
+
+.queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.queue li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.queue li.is-current {
+  border-color: var(--yellow);
+  color: var(--text);
+  background: var(--yellow-dim);
+}
+
+.queue li.is-done {
+  opacity: 0.45;
+}
+
+.queue em {
+  font-style: normal;
+  font-weight: 700;
+  font-family: Outfit, sans-serif;
 }
 
 .controls {
@@ -462,6 +564,22 @@ button {
   top: 3px;
   left: 3px;
   background: #d6d3d1;
+  transition: transform 160ms ease;
+}
+
+.switch.is-on {
+  background: var(--yellow);
+}
+
+.switch.is-on::after {
+  transform: translateX(18px);
+  background: #1a1400;
+}
+
+.row.plan-row,
+button.row {
+  width: 100%;
+  text-align: left;
 }
 
 .btn-danger {
@@ -515,6 +633,12 @@ button {
   text-transform: uppercase;
 }
 
+.field.compact {
+  margin: 0;
+  flex: 1;
+}
+
+.field select,
 .field input,
 .plan-title-field input,
 .cycle-name {

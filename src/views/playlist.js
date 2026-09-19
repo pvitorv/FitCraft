@@ -11,7 +11,7 @@ export async function playlistScreen() {
       <div class="empty">
         <div class="empty-icon">${icons.music}</div>
         <h3>Player chega na 006</h3>
-        <p>Você vai importar arquivos que já possui. O FitCraft não baixa música de YouTube nem Spotify.</p>
+        <p>Na 006 nascem as playlists Summer Eletrohits 1, 2 e 3. Você importa os arquivos que já tem.</p>
       </div>
     `,
   };
