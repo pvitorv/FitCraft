@@ -17,6 +17,13 @@ function downloadText(name, body) {
   window.setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+function fileUrlFromUri(uri) {
+  if (!uri) return "";
+  if (uri.startsWith("file:")) return uri;
+  if (uri.startsWith("/")) return `file://${uri}`;
+  return `file://${uri}`;
+}
+
 async function shareWebFile(name, body, title) {
   const file = new File([body], name, { type: "application/json" });
   if (!navigator.canShare?.({ files: [file] })) {
@@ -25,7 +32,6 @@ async function shareWebFile(name, body, title) {
   await navigator.share({
     files: [file],
     title,
-    text: title,
   });
   return true;
 }
@@ -43,9 +49,7 @@ export async function shareOrSaveText(name, body, title, dialogTitle = "Enviar F
       directory: Directory.Cache,
     });
     await Share.share({
-      title,
-      text: title,
-      files: [uri],
+      files: [fileUrlFromUri(uri)],
       dialogTitle,
     });
     return "shared";
@@ -70,7 +74,7 @@ export async function shareOrSaveCycle(cycleId) {
   const body = stringifyCyclePack(pack);
   const name = fileNameForPack(pack);
   const title = `Ciclo FitCraft: ${pack.cycle.name}`;
-  return shareOrSaveText(name, body, title, "Enviar ciclo FitCraft");
+  return shareOrSaveText(name, body, title, "Enviar ciclo .fitcraft");
 }
 
 export async function shareOrSavePlaylist(playlistId) {
@@ -78,5 +82,5 @@ export async function shareOrSavePlaylist(playlistId) {
   const body = `${JSON.stringify(pack, null, 2)}\n`;
   const name = fileNameForPlaylistPack(pack);
   const title = `Playlist FitCraft: ${pack.playlist.name}`;
-  return shareOrSaveText(name, body, title, "Enviar playlist FitCraft");
+  return shareOrSaveText(name, body, title, "Enviar playlist .fitcraft");
 }

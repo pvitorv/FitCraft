@@ -75,7 +75,7 @@ export async function cicloScreen({ id, cycleId }) {
         <div class="cta-row">
           <button type="button" class="btn btn-primary" data-save-cycle>${icons.check} Salvar ciclo</button>
           <button type="button" class="btn btn-ghost" data-share-cycle ${exercises.length ? "" : "disabled"}>
-            ${icons.share} Enviar .fitcraft
+            ${icons.share} Enviar pelo WhatsApp
           </button>
           <button type="button" class="btn btn-ghost" data-import-cycle>${icons.plus} Receber neste dia</button>
         </div>

@@ -35,7 +35,7 @@ export async function ajustesScreen() {
         <button class="row" type="button" id="import-cycle">
           <div>
             <strong>Receber um ciclo</strong>
-            <p class="muted">Abre um arquivo .fitcraft e coloca no dia que você escolher.</p>
+            <p class="muted">Abre um arquivo .fitcraft — ou toque o arquivo no WhatsApp para o FitCraft receber sozinho.</p>
           </div>
           ${icons.share}
         </button>
@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 022 — ciclos de 7, 14 e 28 dias</p>
+            <p class="muted">FitCraft 023 — .fitcraft direto no WhatsApp</p>
           </div>
-          <strong>022</strong>
+          <strong>023</strong>
         </div>
       </div>
     `,

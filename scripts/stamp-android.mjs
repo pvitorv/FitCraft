@@ -1,4 +1,4 @@
-import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -71,7 +71,49 @@ if (!manifest.includes("android:description")) {
     'android:label="@string/app_name"',
     'android:label="@string/app_name"\n        android:description="@string/app_description"',
   );
-  writeFileSync(manifestPath, manifest);
 }
+
+const javaDir = join(appDir, "src", "main", "java", "com", "fitcraft", "app");
+mkdirSync(javaDir, { recursive: true });
+copyFileSync(join(root, "scripts", "android", "MainActivity.java"), join(javaDir, "MainActivity.java"));
+
+if (!manifest.includes("fitcraft-file")) {
+  const launcherAction = '<action android:name="android.intent.action.MAIN" />';
+  const launcherAt = manifest.indexOf(launcherAction);
+  const filterEnd = launcherAt >= 0 ? manifest.indexOf("</intent-filter>", launcherAt) : -1;
+  if (filterEnd >= 0) {
+    const insertAt = filterEnd + "</intent-filter>".length;
+    manifest =
+      manifest.slice(0, insertAt) +
+      `
+            <!-- fitcraft-file -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\\\.fitcraft" />
+                <data android:pathPattern=".*\\\\..*\\\\.fitcraft" />
+                <data android:pathPattern=".*\\\\..*\\\\..*\\\\.fitcraft" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>` +
+      manifest.slice(insertAt);
+  }
+}
+
+if (!manifest.includes('android:launchMode="singleTask"')) {
+  manifest = manifest.replace('android:name=".MainActivity"', 'android:name=".MainActivity"\n            android:launchMode="singleTask"');
+}
+
+writeFileSync(manifestPath, manifest);
 
 console.log(`APK ${version} assinado como ${vendor}`);

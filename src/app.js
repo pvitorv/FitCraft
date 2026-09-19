@@ -15,6 +15,7 @@ import { ajustesScreen } from "./views/ajustes.js";
 import { financeiroScreen } from "./views/financeiro.js";
 import { nutricaoScreen } from "./views/nutricao.js";
 import { maisScreen } from "./views/mais.js";
+import { bindIncomingFitcraft } from "./services/incomingPack.js";
 
 const screens = {
   home: homeScreen,
@@ -77,6 +78,7 @@ function bindPersist() {
 bootDb()
   .then(() => {
     bindPersist();
+    bindIncomingFitcraft();
     window.addEventListener("hashchange", render);
     return render();
   })

@@ -93,7 +93,7 @@ async function playlistHome() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Playlist local</div>
         <h2>Summer Eletrohits no aparelho.</h2>
-        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém. O envio .fitcraft leva só os nomes das faixas, nunca o áudio.</p>
+        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém. Enviar abre o WhatsApp, Telegram, e-mail ou Drive com o arquivo .fitcraft (só os nomes das faixas, nunca o áudio).</p>
         <div class="cta-row">
           <button class="btn btn-ghost" type="button" id="import-playlist">${icons.share} Receber playlist</button>
         </div>
@@ -185,7 +185,7 @@ async function playlistDetail(id) {
             ${icons.plus} Importar faixas
           </button>
           <button class="btn btn-ghost" type="button" data-share-playlist ${tracks.length ? "" : "disabled"}>
-            ${icons.share} Enviar .fitcraft
+            ${icons.share} Enviar pelo WhatsApp
           </button>
           <button class="btn ${active ? "btn-primary" : "btn-ghost"}" type="button" data-use="${playlist.id}">
             ${active ? `${icons.check} Em uso` : "Usar esta"}
