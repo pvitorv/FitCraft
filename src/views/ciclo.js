@@ -52,7 +52,7 @@ export async function cicloScreen({ id, cycleId }) {
         <div class="kicker"><span class="dot"></span> Ciclo ${String(cycle.day_index + 1).padStart(2, "0")}</div>
         <label class="plan-title-field">
           <span class="sr-only">Nome do ciclo</span>
-          <input id="cycle-name" maxlength="32" value="${escapeHtml(cycle.name)}" />
+          <input id="cycle-name" maxlength="60" value="${escapeHtml(cycle.name)}" />
         </label>
         <p>A preparação acontece uma vez, só no começo. Depois o circuito é só treino e intervalo, quantas séries você marcar.</p>
         <p class="muted">Duração estimada: <strong>${formatClock(total)}</strong>${rounds > 1 ? ` · ${rounds} séries` : ""}</p>
@@ -95,17 +95,25 @@ export async function cicloScreen({ id, cycleId }) {
               ${exercises
                 .map(
                   (exercise, index) => `
-                    <li class="exercise-card">
-                      <div class="exercise-top">
+                    <li class="exercise-card" data-card="${exercise.id}">
+                      <div class="exercise-head">
                         <span class="cycle-index">${String(index + 1).padStart(2, "0")}</span>
-                        <input
+                        <p class="exercise-title" data-title-for="${exercise.id}">${escapeHtml(exercise.name)}</p>
+                      </div>
+                      <label class="exercise-editor">
+                        <span>Nome do exercício</span>
+                        <textarea
                           class="exercise-name"
                           data-exercise-id="${exercise.id}"
-                          maxlength="32"
-                          value="${escapeHtml(exercise.name)}"
+                          maxlength="120"
+                          rows="3"
+                          placeholder="Ex.: Agachamento com salto e toque no chão"
                           aria-label="Nome do exercício ${index + 1}"
-                        />
-                        <button type="button" class="icon-btn" data-delete="${exercise.id}" aria-label="Apagar">${icons.trash}</button>
+                        >${escapeHtml(exercise.name)}</textarea>
+                      </label>
+                      <div class="exercise-actions">
+                        <button type="button" class="btn btn-ghost" data-edit="${exercise.id}">${icons.edit} Editar</button>
+                        <button type="button" class="btn btn-danger" data-delete="${exercise.id}">${icons.trash} Apagar</button>
                       </div>
                       <div class="exercise-meta">
                         ${stepper("work", exercise.work_seconds, `data-exercise-id="${exercise.id}"`)}
@@ -168,14 +176,52 @@ export async function cicloScreen({ id, cycleId }) {
       });
 
       root.querySelector("#add-exercise")?.addEventListener("click", () => {
-        addExercise(cycle.id);
+        const created = addExercise(cycle.id);
+        sessionStorage.setItem("fitcraft.editExercise", String(created.id));
         reload();
+      });
+
+      const openEditor = (id) => {
+        const card = root.querySelector(`[data-card="${id}"]`);
+        if (!card) return;
+        card.classList.add("is-editing");
+        const field = card.querySelector(".exercise-name");
+        field?.focus();
+        field?.setSelectionRange(field.value.length, field.value.length);
+      };
+
+      const pendingEdit = sessionStorage.getItem("fitcraft.editExercise");
+      if (pendingEdit) {
+        sessionStorage.removeItem("fitcraft.editExercise");
+        openEditor(Number(pendingEdit));
+      }
+
+      root.querySelectorAll("[data-edit]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const card = button.closest(".exercise-card");
+          const field = card.querySelector(".exercise-name");
+          if (card.classList.contains("is-editing")) {
+            field.dispatchEvent(new Event("change"));
+            card.classList.remove("is-editing");
+            button.innerHTML = `${icons.edit} Editar`;
+            return;
+          }
+          root.querySelectorAll(".exercise-card").forEach((other) => {
+            other.classList.remove("is-editing");
+            const otherBtn = other.querySelector("[data-edit]");
+            if (otherBtn) otherBtn.innerHTML = `${icons.edit} Editar`;
+          });
+          openEditor(Number(button.dataset.edit));
+          button.innerHTML = "Salvar nome";
+        });
       });
 
       root.querySelectorAll(".exercise-name").forEach((input) => {
         input.addEventListener("change", () => {
           try {
             renameExercise(Number(input.dataset.exerciseId), input.value);
+            const title = root.querySelector(`[data-title-for="${input.dataset.exerciseId}"]`);
+            if (title) title.textContent = input.value.trim();
           } catch (error) {
             alert(error.message);
             reload();

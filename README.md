@@ -2,7 +2,7 @@
 
 App Android **offline** de ciclos metabólicos (preparação, treino e intervalo). Sem loja, sem servidor. Você instala o APK no celular.
 
-Versão atual do código: **007** (mobile sem rolagem lateral).
+Versão atual do código: **008** (nomes longos e botão editar).
 
 ## Como testar no celular (sem emulador)
 
@@ -10,7 +10,7 @@ Versão atual do código: **007** (mobile sem rolagem lateral).
 2. Clique na aba **Actions**.
 3. Abra a execução mais recente de **Build APK**.
 4. Espere o ✓ verde (a primeira vez pode levar até 15 minutos).
-5. No final da página, em **Artifacts**, baixe `fitcraft-007`.
+5. No final da página, em **Artifacts**, baixe `fitcraft-008`.
 6. Abra o zip, pegue o `.apk`, mande para o celular (Telegram, Drive ou cabo).
 7. Instale permitindo fontes desconhecidas só para este arquivo.
 
@@ -36,8 +36,9 @@ Sempre sequenciais: `001`, `002`, `003`…
 - `005` — timer de verdade
 - `006` — repetições da sequência
 - `007` — mobile sem corte lateral; preparação só no início
-- `008` — playlist local (Summer Eletrohits 1, 2 e 3)
-- `009` — polimento
+- `008` — nomes longos e botão editar nos cards
+- `009` — playlist local (Summer Eletrohits 1, 2 e 3)
+- `010` — polimento
 
 O `main` só avança quando aquela versão rodou no seu aparelho.
 

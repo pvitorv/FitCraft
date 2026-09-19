@@ -771,12 +771,16 @@ button.row {
 
 .cycle-link {
   width: 100%;
-  grid-template-columns: 52px 1fr auto;
-  padding: 8px 8px 8px 0;
+  grid-template-columns: 52px minmax(0, 1fr);
+  padding: 10px;
   text-align: left;
   border-radius: 18px;
   background: var(--surface);
   border: 1px solid var(--line);
+}
+
+.cycle-link .btn {
+  grid-column: 1 / -1;
 }
 
 .cycle-link svg {
@@ -862,22 +866,56 @@ button.row {
   border: 1px solid #ff1a1a;
 }
 
-.exercise-top {
+.exercise-head {
   display: grid;
-  grid-template-columns: 52px 1fr 42px;
-  gap: 8px;
-  align-items: center;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
 }
 
-.exercise-name {
-  width: 100%;
-  min-height: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--text);
-  padding: 0 12px;
+.exercise-title {
+  margin: 0;
   font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.exercise-editor {
+  display: none;
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.exercise-card.is-editing .exercise-editor {
+  display: grid;
+}
+
+.exercise-editor span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd6d6;
+}
+
+textarea.exercise-name {
+  width: 100%;
+  min-height: 108px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--text);
+  padding: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.exercise-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .exercise-meta {
@@ -966,6 +1004,14 @@ button.row {
 
   .rounds-card {
     grid-template-columns: minmax(0, 1fr) minmax(140px, 180px);
+  }
+
+  .cycle-link {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+  }
+
+  .cycle-link .btn {
+    grid-column: auto;
   }
 }
 

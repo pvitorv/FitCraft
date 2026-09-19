@@ -20,7 +20,7 @@ export async function homeScreen() {
       <section class="layout-split">
         <div>
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 007</div>
+            <div class="kicker"><span class="dot"></span> Versão 008</div>
             <h2>Seu cronômetro de treino metabólico.</h2>
             <p>${
               plan

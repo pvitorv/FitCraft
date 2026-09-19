@@ -155,14 +155,16 @@ export async function planoScreen({ id }) {
           .map(
             (cycle) => `
               <li>
-                <button class="cycle-item cycle-link" data-go="/planos/${plan.id}/ciclos/${cycle.id}">
+                <div class="cycle-item cycle-link">
                   <span class="cycle-index">${String(cycle.day_index + 1).padStart(2, "0")}</span>
                   <div class="cycle-copy">
                     <strong>${escapeHtml(cycle.name)}</strong>
                     <p class="muted">${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
                   </div>
-                  ${icons.chevron}
-                </button>
+                  <button class="btn btn-ghost" type="button" data-go="/planos/${plan.id}/ciclos/${cycle.id}">
+                    ${icons.edit} Editar
+                  </button>
+                </div>
               </li>
             `,
           )
