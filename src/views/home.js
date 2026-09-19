@@ -54,12 +54,12 @@ export async function homeScreen() {
           </article>
 
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 021</div>
+            <div class="kicker"><span class="dot"></span> Versão 022</div>
             <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan
                 ? `Plano ativo: <strong>${escapeHtml(plan.name)}</strong> · o app abre o ciclo de ${escapeHtml(now.weekdayName.toLowerCase())}, ${escapeHtml(now.clock)}. Reaproveitar outro dia é escolha sua.`
-                : "Crie um plano de 7, 15 ou 30 ciclos. Os dados ficam no SQLite deste aparelho."
+                : "Crie um plano de 7, 14 ou 28 ciclos. Os dados ficam no SQLite deste aparelho."
             }</p>
             <div class="cta-row">
               <button class="btn btn-primary" ${canTrain ? `data-go="/treino/${cycle.id}"` : "disabled"}>
@@ -122,7 +122,7 @@ export async function homeScreen() {
               : `
                 <div class="empty-icon">${icons.dumbbell}</div>
                 <h3>Nenhum plano ainda</h3>
-                <p>Crie 7, 15 ou 30 ciclos e dê nomes como Domingo, Segunda… até Sábado.</p>
+                <p>Crie 7, 14 ou 28 ciclos e dê nomes como Domingo, Segunda… até Sábado.</p>
               `
           }
         </aside>

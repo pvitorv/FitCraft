@@ -27,8 +27,19 @@ export function weekdayIndex(date = new Date()) {
   return date.getDay();
 }
 
+function utcDayNumber(date) {
+  return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+}
+
+const WEEK_ORIGIN = utcDayNumber(new Date(2026, 8, 13));
+
 export function cycleDayIndex(daysCount, date = new Date()) {
-  return weekdayIndex(date) % daysCount;
+  const weekday = weekdayIndex(date);
+  const weeks = Math.max(1, Math.round(Number(daysCount) / 7));
+  if (weeks <= 1) return weekday;
+  const weekNum = Math.round((utcDayNumber(startOfWeek(date)) - WEEK_ORIGIN) / 7);
+  const slot = ((weekNum % weeks) + weeks) % weeks;
+  return slot * 7 + weekday;
 }
 
 export function greeting(date = new Date()) {

@@ -16,8 +16,8 @@ export async function planosScreen() {
     html: `
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Planos</div>
-        <h2>7, 15 ou 30 ciclos.</h2>
-        <p>Um ciclo por dia. Semanal, quinzenal ou mensal — tudo gravado no SQLite.</p>
+        <h2>7, 14 ou 28 ciclos.</h2>
+        <p>Semanas inteiras, de domingo a sábado. Semanal, 2 semanas ou 4 semanas — tudo gravado no SQLite.</p>
         <div class="cta-row">
           <button class="btn btn-primary" data-go="/planos/novo">${icons.plus} Novo plano</button>
           <button class="btn btn-ghost" type="button" id="import-cycle">${icons.share} Receber um ciclo</button>
@@ -62,7 +62,7 @@ export async function planoNovoScreen() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Novo plano</div>
         <h2>Quantos dias você vai treinar?</h2>
-        <p>O app cria um ciclo para cada dia. Depois você pode trocar os nomes.</p>
+        <p>O app cria um ciclo para cada dia. 7, 14 ou 28 — sempre semanas fechadas, domingo a sábado.</p>
       </article>
       <form class="stack" id="plan-form">
         <label class="field">
@@ -76,14 +76,14 @@ export async function planoNovoScreen() {
             <span>Semanal</span>
           </label>
           <label class="choice">
-            <input type="radio" name="days" value="15" />
-            <strong>15</strong>
-            <span>Quinzenal</span>
+            <input type="radio" name="days" value="14" />
+            <strong>14</strong>
+            <span>2 semanas</span>
           </label>
           <label class="choice">
-            <input type="radio" name="days" value="30" />
-            <strong>30</strong>
-            <span>Mensal</span>
+            <input type="radio" name="days" value="28" />
+            <strong>28</strong>
+            <span>4 semanas</span>
           </label>
         </div>
         <p class="form-error" id="plan-error" hidden></p>

@@ -1,5 +1,5 @@
 import { all, get, lastId, run } from "../database/connection.js";
-import { defaultCycleNames } from "../lib/cycleNames.js";
+import { PLAN_DAYS, defaultCycleNames } from "../lib/cycleNames.js";
 import { deleteExercisesForPlan } from "./Exercise.js";
 import { getActivePlanId, setActivePlanId } from "./Setting.js";
 
@@ -27,8 +27,8 @@ export function createPlan(name, daysCount) {
   if (!trimmed) {
     throw new Error("Dê um nome ao plano.");
   }
-  if (![7, 15, 30].includes(daysCount)) {
-    throw new Error("Escolha 7, 15 ou 30 ciclos.");
+  if (!PLAN_DAYS.includes(daysCount)) {
+    throw new Error("Escolha 7, 14 ou 28 ciclos.");
   }
 
   run(

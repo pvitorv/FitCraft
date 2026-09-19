@@ -13,7 +13,7 @@ export function migrate(database) {
     CREATE TABLE IF NOT EXISTS plans (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      days_count INTEGER NOT NULL CHECK (days_count IN (7, 15, 30)),
+      days_count INTEGER NOT NULL CHECK (days_count IN (7, 14, 28)),
       created_at TEXT NOT NULL
     );
 
@@ -111,6 +111,7 @@ export function migrate(database) {
   });
 
   rotateSevenDayPlansToSundayFirst(database);
+  convertPlansToWeekBlocks(database);
 }
 
 function settingValue(database, key) {
@@ -132,4 +133,61 @@ function rotateSevenDayPlansToSundayFirst(database) {
     WHERE day_index >= 100
   `);
   database.run("INSERT OR REPLACE INTO settings (key, value) VALUES ('week_sunday_first', '1')");
+}
+
+function tableSql(database, name) {
+  const rows = database.exec(
+    "SELECT sql FROM sqlite_master WHERE type='table' AND name='" + name.replace(/'/g, "''") + "'",
+  );
+  return rows[0]?.values?.[0]?.[0] ?? "";
+}
+
+function convertPlansToWeekBlocks(database) {
+  if (settingValue(database, "week_blocks_14_28") === "1") return;
+
+  database.run(`
+    DELETE FROM exercises
+    WHERE cycle_id IN (
+      SELECT id FROM cycles
+      WHERE (plan_id IN (SELECT id FROM plans WHERE days_count = 15) AND day_index >= 14)
+         OR (plan_id IN (SELECT id FROM plans WHERE days_count = 30) AND day_index >= 28)
+    )
+  `);
+  database.run(`
+    DELETE FROM cycles
+    WHERE (plan_id IN (SELECT id FROM plans WHERE days_count = 15) AND day_index >= 14)
+       OR (plan_id IN (SELECT id FROM plans WHERE days_count = 30) AND day_index >= 28)
+  `);
+
+  if (tableSql(database, "plans").includes("15")) {
+    database.run("PRAGMA foreign_keys = OFF");
+    database.run(`
+      CREATE TABLE plans_new (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        days_count INTEGER NOT NULL CHECK (days_count IN (7, 14, 28)),
+        created_at TEXT NOT NULL
+      )
+    `);
+    database.run(`
+      INSERT INTO plans_new (id, name, days_count, created_at)
+      SELECT
+        id,
+        name,
+        CASE days_count WHEN 15 THEN 14 WHEN 30 THEN 28 ELSE days_count END,
+        created_at
+      FROM plans
+    `);
+    database.run("DROP TABLE plans");
+    database.run("ALTER TABLE plans_new RENAME TO plans");
+    try {
+      database.run("DELETE FROM sqlite_sequence WHERE name IN ('plans', 'plans_new')");
+      database.run("INSERT INTO sqlite_sequence (name, seq) SELECT 'plans', COALESCE(MAX(id), 0) FROM plans");
+    } catch {
+      // sqlite_sequence só existe depois do primeiro AUTOINCREMENT
+    }
+    database.run("PRAGMA foreign_keys = ON");
+  }
+
+  database.run("INSERT OR REPLACE INTO settings (key, value) VALUES ('week_blocks_14_28', '1')");
 }

@@ -20,7 +20,7 @@ export async function maisScreen() {
         <button class="row" data-go="/planos">
           <div>
             <strong>Planos de treino</strong>
-            <p class="muted">7, 15 ou 30 ciclos e o arquivo .fitcraft.</p>
+            <p class="muted">7, 14 ou 28 ciclos e o arquivo .fitcraft.</p>
           </div>
           ${icons.plans}
         </button>

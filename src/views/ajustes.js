@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 021 — semana de domingo a sábado</p>
+            <p class="muted">FitCraft 022 — ciclos de 7, 14 e 28 dias</p>
           </div>
-          <strong>021</strong>
+          <strong>022</strong>
         </div>
       </div>
     `,
