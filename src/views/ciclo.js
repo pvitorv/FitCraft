@@ -5,6 +5,7 @@ import { cycleRounds, findCycle, renameCycle, setCycleRounds, setCycleTimes } fr
 import {
   addExercise,
   deleteExercise,
+  findExercise,
   listExercises,
   moveExercise,
   renameExercise,
@@ -25,6 +26,17 @@ function stepper(kind, value, extra = "", format = "clock") {
   `;
 }
 
+function paintStepper(stepperEl, value, format = "clock") {
+  const label = stepperEl.querySelector("strong");
+  if (label) label.textContent = format === "count" ? `${value}×` : formatClock(value);
+}
+
+function durationCopy(cycle, items) {
+  const count = cycleRounds(cycle);
+  const total = cycleDuration(cycle, items);
+  return `Duração estimada: <strong>${formatClock(total)}</strong>${count > 1 ? ` · ${count} séries` : ""}`;
+}
+
 export async function cicloScreen({ id, cycleId }) {
   const plan = findPlan(id);
   const cycle = findCycle(cycleId);
@@ -43,7 +55,6 @@ export async function cicloScreen({ id, cycleId }) {
   const exercises = listExercises(cycle.id);
   const nextName = exercises[1]?.name ?? "Próximo exercício";
   const rounds = cycleRounds(cycle);
-  const total = cycleDuration(cycle, exercises);
 
   return {
     html: `
@@ -55,7 +66,7 @@ export async function cicloScreen({ id, cycleId }) {
           <input id="cycle-name" maxlength="60" value="${escapeHtml(cycle.name)}" />
         </label>
         <p>A preparação acontece uma vez, só no começo. Depois o circuito é só treino e intervalo, quantas séries você marcar.</p>
-        <p class="muted">Duração estimada: <strong>${formatClock(total)}</strong>${rounds > 1 ? ` · ${rounds} séries` : ""}</p>
+        <p class="muted" data-cycle-duration>${durationCopy(cycle, exercises)}</p>
       </article>
 
       <article class="card rounds-card">
@@ -146,32 +157,41 @@ export async function cicloScreen({ id, cycleId }) {
         }
       });
 
+      const paintDuration = () => {
+        const el = root.querySelector("[data-cycle-duration]");
+        if (el) el.innerHTML = durationCopy(findCycle(cycle.id), listExercises(cycle.id));
+      };
+
       root.querySelectorAll(".stepper button").forEach((button) => {
         button.addEventListener("click", () => {
           const stepperEl = button.closest(".stepper");
           const delta = Number(button.dataset.delta);
           const kind = stepperEl.dataset.kind;
+          const current = findCycle(cycle.id);
+
           if (kind === "rounds") {
-            setCycleRounds(cycle.id, rounds + delta);
+            setCycleRounds(cycle.id, cycleRounds(current) + delta);
+            paintStepper(stepperEl, cycleRounds(findCycle(cycle.id)), "count");
           } else if (kind === "prep") {
             setCycleTimes(cycle.id, {
-              prepSeconds: cycle.prep_seconds + delta,
-              restSeconds: cycle.rest_seconds,
+              prepSeconds: current.prep_seconds + delta,
+              restSeconds: current.rest_seconds,
             });
+            paintStepper(stepperEl, findCycle(cycle.id).prep_seconds);
           } else if (kind === "rest") {
             setCycleTimes(cycle.id, {
-              prepSeconds: cycle.prep_seconds,
-              restSeconds: cycle.rest_seconds + delta,
+              prepSeconds: current.prep_seconds,
+              restSeconds: current.rest_seconds + delta,
             });
+            paintStepper(stepperEl, findCycle(cycle.id).rest_seconds);
           } else {
-            const exercise = exercises.find(
-              (item) => item.id === Number(stepperEl.dataset.exerciseId),
-            );
+            const exercise = findExercise(Number(stepperEl.dataset.exerciseId));
             if (exercise) {
               setExerciseWork(exercise.id, exercise.work_seconds + delta);
+              paintStepper(stepperEl, findExercise(exercise.id).work_seconds);
             }
           }
-          reload();
+          paintDuration();
         });
       });
 

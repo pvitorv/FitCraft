@@ -23,9 +23,15 @@ const screens = {
   ajustes: ajustesScreen,
 };
 
+let lastPath = "";
+
 async function render() {
   const root = document.querySelector("#app");
   const route = parseRoute();
+  const currentScreen = root.querySelector(".screen");
+  const keepScroll = lastPath === route.path;
+  const scrollTop = keepScroll && currentScreen ? currentScreen.scrollTop : 0;
+
   if (route.name !== "treino") {
     timerEngine.leave();
     releaseAwake();
@@ -35,6 +41,12 @@ async function render() {
   root.innerHTML = renderShell(html);
   bindNavigation(root);
   bind?.(root);
+
+  if (keepScroll) {
+    const nextScreen = root.querySelector(".screen");
+    if (nextScreen) nextScreen.scrollTop = scrollTop;
+  }
+  lastPath = route.path;
 }
 
 bootDb()

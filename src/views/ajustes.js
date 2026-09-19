@@ -40,9 +40,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 008 — nomes longos e botão editar</p>
+            <p class="muted">FitCraft 009 — tempo sem pular a tela</p>
           </div>
-          <strong>008</strong>
+          <strong>009</strong>
         </div>
       </div>
     `,
