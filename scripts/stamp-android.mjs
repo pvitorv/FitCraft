@@ -6,7 +6,20 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const version = readFileSync(join(root, "VERSION"), "utf8").trim();
 const versionCode = Number(version);
 const vendor = "CriaSysWeb / Paulo Vitor Vaz";
+const vendorAddress = "REDACTED";
+const vendorPhone = "REDACTED";
+const vendorEmail = "REDACTED";
+const vendorDescription = `FitCraft. Fornecedor: ${vendor}. ${vendorAddress}. Fone: ${vendorPhone}. E-mail: ${vendorEmail}.`;
 const storePassword = "REDACTED";
+
+function xmlText(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
 
 const appDir = join(root, "android", "app");
 copyFileSync(join(root, "signing", "fitcraft.p12"), join(appDir, "fitcraft.p12"));
@@ -44,8 +57,8 @@ let strings = readFileSync(stringsPath, "utf8");
 if (!strings.includes("app_vendor")) {
   strings = strings.replace(
     "</resources>",
-    `    <string name="app_vendor">${vendor}</string>
-    <string name="app_description">FitCraft. Fornecedor: ${vendor}.</string>
+    `    <string name="app_vendor">${xmlText(vendor)}</string>
+    <string name="app_description">${xmlText(vendorDescription)}</string>
 </resources>`,
   );
   writeFileSync(stringsPath, strings);
