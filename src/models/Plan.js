@@ -1,5 +1,6 @@
 import { all, get, lastId, run } from "../database/connection.js";
 import { defaultCycleNames } from "../lib/cycleNames.js";
+import { deleteExercisesForPlan } from "./Exercise.js";
 import { getActivePlanId, setActivePlanId } from "./Setting.js";
 
 export function listPlans() {
@@ -70,6 +71,7 @@ export function activatePlan(id) {
 }
 
 export function deletePlan(id) {
+  deleteExercisesForPlan(id);
   run("DELETE FROM cycles WHERE plan_id = ?", [id]);
   run("DELETE FROM plans WHERE id = ?", [id]);
   if (getActivePlanId() === id) {

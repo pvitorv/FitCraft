@@ -4,6 +4,7 @@ import { escapeHtml } from "./lib/html.js";
 import { parseRoute } from "./routes.js";
 import { bindNavigation, renderShell } from "./views/layout.js";
 import { homeScreen } from "./views/home.js";
+import { cicloScreen } from "./views/ciclo.js";
 import { planoNovoScreen, planoScreen, planosScreen } from "./views/planos.js";
 import { treinoScreen } from "./views/treino.js";
 import { playlistScreen } from "./views/playlist.js";
@@ -14,6 +15,7 @@ const screens = {
   planos: planosScreen,
   planoNovo: planoNovoScreen,
   plano: planoScreen,
+  ciclo: cicloScreen,
   treino: treinoScreen,
   playlist: playlistScreen,
   ajustes: ajustesScreen,

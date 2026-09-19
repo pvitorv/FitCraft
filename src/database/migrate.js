@@ -24,5 +24,16 @@ export function migrate(database) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_cycles_plan ON cycles(plan_id, day_index);
+
+    CREATE TABLE IF NOT EXISTS exercises (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cycle_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      sort_order INTEGER NOT NULL,
+      work_seconds INTEGER NOT NULL DEFAULT 40,
+      FOREIGN KEY (cycle_id) REFERENCES cycles(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_exercises_cycle ON exercises(cycle_id, sort_order);
   `);
 }

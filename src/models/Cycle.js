@@ -1,8 +1,16 @@
 import { all, get, run } from "../database/connection.js";
+import { clampSeconds } from "../lib/time.js";
 
 export function listCycles(planId) {
   return all(
-    "SELECT * FROM cycles WHERE plan_id = ? ORDER BY day_index ASC",
+    `
+      SELECT
+        cycles.*,
+        (SELECT COUNT(*) FROM exercises WHERE exercises.cycle_id = cycles.id) AS exercise_count
+      FROM cycles
+      WHERE plan_id = ?
+      ORDER BY day_index ASC
+    `,
     [planId],
   );
 }
@@ -14,10 +22,31 @@ export function firstCycle(planId) {
   );
 }
 
+export function findCycle(id) {
+  return get(
+    `
+      SELECT
+        cycles.*,
+        (SELECT COUNT(*) FROM exercises WHERE exercises.cycle_id = cycles.id) AS exercise_count
+      FROM cycles
+      WHERE id = ?
+    `,
+    [id],
+  );
+}
+
 export function renameCycle(id, name) {
   const trimmed = name.trim();
   if (!trimmed) {
     throw new Error("O ciclo precisa de um nome.");
   }
   run("UPDATE cycles SET name = ? WHERE id = ?", [trimmed, id]);
+}
+
+export function setCycleTimes(id, { prepSeconds, restSeconds }) {
+  run("UPDATE cycles SET prep_seconds = ?, rest_seconds = ? WHERE id = ?", [
+    clampSeconds(prepSeconds, 3, 600),
+    clampSeconds(restSeconds, 5, 600),
+    id,
+  ]);
 }

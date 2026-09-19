@@ -18,6 +18,16 @@ export function parseRoute() {
     };
   }
 
+  const cycleMatch = hash.match(/^\/planos\/(\d+)\/ciclos\/(\d+)$/);
+  if (cycleMatch) {
+    return {
+      name: "ciclo",
+      path: hash,
+      nav: "/planos",
+      params: { id: Number(cycleMatch[1]), cycleId: Number(cycleMatch[2]) },
+    };
+  }
+
   const planMatch = hash.match(/^\/planos\/(\d+)$/);
   if (planMatch) {
     return {

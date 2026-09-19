@@ -1,19 +1,24 @@
 import { daysLabel } from "../lib/cycleNames.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
+import { formatClock } from "../lib/time.js";
 import { firstCycle } from "../models/Cycle.js";
+import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
 
 export async function homeScreen() {
   const plan = getActivePlan();
   const cycle = plan ? firstCycle(plan.id) : null;
+  const exercises = cycle ? listExercises(cycle.id) : [];
+  const first = exercises[0] ?? null;
+  const second = exercises[1] ?? null;
 
   return {
     html: `
       <section class="layout-split">
         <div>
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 003</div>
+            <div class="kicker"><span class="dot"></span> Versão 004</div>
             <h2>Seu cronômetro de treino metabólico.</h2>
             <p>${
               plan
@@ -32,18 +37,18 @@ export async function homeScreen() {
           <div class="grid cols-3">
             <article class="card phase-prep">
               <small>Preparação</small>
-              <strong>${cycle ? escapeHtml(cycle.name) : "Nome do 1º exercício"}</strong>
-              <p>Contagem regressiva do aquecimento.</p>
+              <strong>${first ? escapeHtml(first.name) : "Nome do 1º exercício"}</strong>
+              <p>${cycle ? `${formatClock(cycle.prep_seconds)} de aquecimento.` : "Contagem regressiva do aquecimento."}</p>
             </article>
             <article class="card phase-train">
               <small>Treino</small>
-              <strong>${cycle ? escapeHtml(cycle.name) : "Exercício atual"}</strong>
-              <p>Tempo que você definir para cada movimento.</p>
+              <strong>${first ? escapeHtml(first.name) : "Exercício atual"}</strong>
+              <p>${first ? `${formatClock(first.work_seconds)} neste movimento.` : "Tempo que você definir para cada movimento."}</p>
             </article>
             <article class="card phase-rest">
               <small>Intervalo</small>
-              <strong>Próximo exercício</strong>
-              <p>Descanso já mostrando o que vem a seguir.</p>
+              <strong>${second ? escapeHtml(second.name) : "Próximo exercício"}</strong>
+              <p>${cycle ? `${formatClock(cycle.rest_seconds)} de descanso.` : "Descanso já mostrando o que vem a seguir."}</p>
             </article>
           </div>
         </div>
@@ -54,7 +59,11 @@ export async function homeScreen() {
               ? `
                 <small>Hoje neste plano</small>
                 <h3>${escapeHtml(cycle ? cycle.name : plan.name)}</h3>
-                <p class="muted">${escapeHtml(plan.name)} · ${plan.days_count} dias. Exercícios entram na 004.</p>
+                <p class="muted">${
+                  first
+                    ? `${exercises.length} exercício${exercises.length === 1 ? "" : "s"} · começa com ${escapeHtml(first.name)}.`
+                    : "Abra o ciclo e adicione os exercícios."
+                }</p>
               `
               : `
                 <div class="empty-icon">${icons.dumbbell}</div>

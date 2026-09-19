@@ -622,6 +622,131 @@ button {
   gap: 10px;
 }
 
+.cycle-link {
+  width: 100%;
+  grid-template-columns: 52px 1fr auto;
+  padding: 8px 8px 8px 0;
+  text-align: left;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.cycle-link svg {
+  width: 18px;
+  height: 18px;
+  color: var(--faint);
+}
+
+.cycle-copy strong {
+  display: block;
+}
+
+.cycle-copy p {
+  margin: 4px 0 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.section-head .section-title {
+  margin: 22px 0 10px;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.stepper button {
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.stepper strong {
+  text-align: center;
+  font-family: Outfit, sans-serif;
+  font-size: 1.2rem;
+}
+
+.exercise-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.exercise-card {
+  padding: 12px;
+  border-radius: 20px;
+  background: var(--red-dim);
+  border: 1px solid #ff1a1a;
+}
+
+.exercise-top {
+  display: grid;
+  grid-template-columns: 52px 1fr 42px;
+  gap: 8px;
+  align-items: center;
+}
+
+.exercise-name {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  padding: 0 12px;
+  font-weight: 700;
+}
+
+.exercise-meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.move-row {
+  display: flex;
+  gap: 6px;
+}
+
+.move-row .btn {
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+.icon-btn {
+  height: 42px;
+  width: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #ffd6d6;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .cycle-index {
   height: 52px;
   display: grid;

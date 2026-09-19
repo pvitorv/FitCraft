@@ -24,16 +24,16 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Banco local</strong>
-            <p class="muted">SQLite no aparelho — planos e ciclos da 003</p>
+            <p class="muted">SQLite no aparelho — planos, ciclos e exercícios</p>
           </div>
           <strong>OK</strong>
         </div>
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 003 — planos e ciclos</p>
+            <p class="muted">FitCraft 004 — exercícios do ciclo</p>
           </div>
-          <strong>003</strong>
+          <strong>004</strong>
         </div>
       </div>
     `,
