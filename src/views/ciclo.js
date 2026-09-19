@@ -11,6 +11,7 @@ import {
   renameExercise,
   setExerciseWork,
 } from "../models/Exercise.js";
+import { persistNow } from "../database/connection.js";
 import { findPlan } from "../models/Plan.js";
 import { flushEdits } from "../lib/flushEdits.js";
 import { go } from "../routes.js";
@@ -68,6 +69,9 @@ export async function cicloScreen({ id, cycleId }) {
         </label>
         <p>A preparação acontece uma vez, só no começo. Depois o circuito é só treino e intervalo, quantas séries você marcar.</p>
         <p class="muted" data-cycle-duration>${durationCopy(cycle, exercises)}</p>
+        <div class="cta-row">
+          <button type="button" class="btn btn-primary" data-save-cycle>${icons.check} Salvar ciclo</button>
+        </div>
       </article>
 
       <article class="card rounds-card">
@@ -145,6 +149,10 @@ export async function cicloScreen({ id, cycleId }) {
               <p>Adicione os movimentos deste dia. O primeiro aparece na preparação.</p>
             </div>`
       }
+      <div class="save-bar">
+        <p data-save-status>Confirma nome, tempos e a lista deste dia.</p>
+        <button type="button" class="btn btn-primary" data-save-cycle>${icons.check} Salvar ciclo</button>
+      </div>
     `,
     bind(root) {
       const reload = () => {
@@ -274,6 +282,28 @@ export async function cicloScreen({ id, cycleId }) {
           flushEdits(root);
           moveExercise(Number(button.dataset.move), Number(button.dataset.dir));
           reload();
+        });
+      });
+
+      const paintSaved = () => {
+        root.querySelectorAll("[data-save-status]").forEach((el) => {
+          el.textContent = "Ciclo salvo neste aparelho.";
+        });
+        root.querySelectorAll("[data-save-cycle]").forEach((button) => {
+          button.innerHTML = `${icons.check} Ciclo salvo`;
+        });
+      };
+
+      root.querySelectorAll("[data-save-cycle]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          flushEdits(root);
+          root.querySelectorAll(".exercise-card.is-editing").forEach((card) => {
+            card.classList.remove("is-editing");
+            const edit = card.querySelector("[data-edit]");
+            if (edit) edit.innerHTML = `${icons.edit} Editar`;
+          });
+          await persistNow();
+          paintSaved();
         });
       });
     },

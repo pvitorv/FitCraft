@@ -40,9 +40,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 011 — grava o que você digita</p>
+            <p class="muted">FitCraft 012 — botão salvar ciclo</p>
           </div>
-          <strong>011</strong>
+          <strong>012</strong>
         </div>
       </div>
     `,
