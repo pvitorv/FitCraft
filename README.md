@@ -6,13 +6,15 @@ Versão atual do código: **015** (arquivo `.fitcraft` para enviar um ciclo).
 
 ## Como testar no celular (sem emulador)
 
-1. Entre em **github.com** no seu repositório FitCraft.
-2. Clique na aba **Actions**.
-3. Abra a execução mais recente de **Build APK**.
-4. Espere o ✓ verde (a primeira vez pode levar até 15 minutos).
-5. No final da página, em **Artifacts**, baixe `fitcraft-015`.
-6. Abra o zip, pegue o `.apk`, mande para o celular (Telegram, Drive ou cabo).
-7. Instale permitindo fontes desconhecidas só para este arquivo.
+1. Abra **https://github.com/pvitorv/FitCraft**.
+2. Clique na aba **Actions** (ao lado de Code, Issues, Pull requests).
+3. Na esquerda, clique em **Build APK**.
+4. Abra a execução mais recente da branch **015**.
+5. Espere o ✓ verde (pode levar até 15 minutos). Se estiver X vermelho, avise.
+6. No final da página, em **Artifacts**, baixe `fitcraft-015`.
+7. O GitHub manda um **zip**. Abra, pegue o `fitcraft-015.apk`.
+8. Mande o APK para o celular (WhatsApp, Telegram, Drive ou cabo).
+9. No celular: abra o arquivo → **Instalar**. Se pedir, permita **fontes desconhecidas** só para este app.
 
 Se aparecer X vermelho, abra o log e me avise. Você não precisa mexer no Actions.
 
