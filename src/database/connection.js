@@ -8,16 +8,32 @@ const DB_KEY = "sqlite";
 
 let database = null;
 let persistTimer = null;
+let persistChain = Promise.resolve();
+let idbPromise = null;
 
 function openIdb() {
-  return new Promise((resolve, reject) => {
+  if (idbPromise) return idbPromise;
+
+  idbPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(IDB_NAME, 1);
     request.onupgradeneeded = () => {
-      request.result.createObjectStore(STORE);
+      if (!request.result.objectStoreNames.contains(STORE)) {
+        request.result.createObjectStore(STORE);
+      }
     };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      request.result.onclose = () => {
+        idbPromise = null;
+      };
+      resolve(request.result);
+    };
+    request.onerror = () => {
+      idbPromise = null;
+      reject(request.error);
+    };
   });
+
+  return idbPromise;
 }
 
 async function readBytes() {
@@ -52,7 +68,7 @@ export async function bootDb() {
   database = saved ? new SQL.Database(new Uint8Array(saved)) : new SQL.Database();
   database.run("PRAGMA foreign_keys = ON;");
   migrate(database);
-  await persist();
+  await persistNow();
   return database;
 }
 
@@ -63,9 +79,20 @@ export function db() {
   return database;
 }
 
-export async function persist() {
-  if (!database) return;
-  await writeBytes(database.export());
+export function persist() {
+  persistChain = persistChain
+    .catch(() => {})
+    .then(async () => {
+      if (!database) return;
+      await writeBytes(database.export());
+    });
+  return persistChain;
+}
+
+export async function persistNow() {
+  clearTimeout(persistTimer);
+  persistTimer = null;
+  await persist();
 }
 
 export function schedulePersist() {

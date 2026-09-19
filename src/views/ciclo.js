@@ -12,6 +12,7 @@ import {
   setExerciseWork,
 } from "../models/Exercise.js";
 import { findPlan } from "../models/Plan.js";
+import { flushEdits } from "../lib/flushEdits.js";
 import { go } from "../routes.js";
 
 function stepper(kind, value, extra = "", format = "clock") {
@@ -63,7 +64,7 @@ export async function cicloScreen({ id, cycleId }) {
         <div class="kicker"><span class="dot"></span> Ciclo ${String(cycle.day_index + 1).padStart(2, "0")}</div>
         <label class="plan-title-field">
           <span class="sr-only">Nome do ciclo</span>
-          <input id="cycle-name" maxlength="60" value="${escapeHtml(cycle.name)}" />
+          <input id="cycle-name" data-cycle-id="${cycle.id}" maxlength="60" value="${escapeHtml(cycle.name)}" />
         </label>
         <p>A preparação acontece uma vez, só no começo. Depois o circuito é só treino e intervalo, quantas séries você marcar.</p>
         <p class="muted" data-cycle-duration>${durationCopy(cycle, exercises)}</p>
@@ -146,16 +147,22 @@ export async function cicloScreen({ id, cycleId }) {
       }
     `,
     bind(root) {
-      const reload = () => go(`/planos/${plan.id}/ciclos/${cycle.id}`);
+      const reload = () => {
+        flushEdits(root);
+        go(`/planos/${plan.id}/ciclos/${cycle.id}`);
+      };
 
-      root.querySelector("#cycle-name").addEventListener("change", (event) => {
+      const saveCycleName = (event) => {
+        if (!event.target.value.trim()) return;
         try {
           renameCycle(cycle.id, event.target.value);
         } catch (error) {
-          event.target.value = cycle.name;
+          event.target.value = findCycle(cycle.id).name;
           alert(error.message);
         }
-      });
+      };
+      root.querySelector("#cycle-name").addEventListener("input", saveCycleName);
+      root.querySelector("#cycle-name").addEventListener("change", saveCycleName);
 
       const paintDuration = () => {
         const el = root.querySelector("[data-cycle-duration]");
@@ -196,6 +203,7 @@ export async function cicloScreen({ id, cycleId }) {
       });
 
       root.querySelector("#add-exercise")?.addEventListener("click", () => {
+        flushEdits(root);
         const created = addExercise(cycle.id);
         sessionStorage.setItem("fitcraft.editExercise", String(created.id));
         reload();
@@ -219,13 +227,13 @@ export async function cicloScreen({ id, cycleId }) {
       root.querySelectorAll("[data-edit]").forEach((button) => {
         button.addEventListener("click", () => {
           const card = button.closest(".exercise-card");
-          const field = card.querySelector(".exercise-name");
           if (card.classList.contains("is-editing")) {
-            field.dispatchEvent(new Event("change"));
+            flushEdits(root);
             card.classList.remove("is-editing");
             button.innerHTML = `${icons.edit} Editar`;
             return;
           }
+          flushEdits(root);
           root.querySelectorAll(".exercise-card").forEach((other) => {
             other.classList.remove("is-editing");
             const otherBtn = other.querySelector("[data-edit]");
@@ -236,21 +244,26 @@ export async function cicloScreen({ id, cycleId }) {
         });
       });
 
+      const saveExerciseField = (input) => {
+        if (!input.value.trim()) return;
+        try {
+          renameExercise(Number(input.dataset.exerciseId), input.value);
+          const title = root.querySelector(`[data-title-for="${input.dataset.exerciseId}"]`);
+          if (title) title.textContent = input.value.trim();
+        } catch (error) {
+          alert(error.message);
+          reload();
+        }
+      };
+
       root.querySelectorAll(".exercise-name").forEach((input) => {
-        input.addEventListener("change", () => {
-          try {
-            renameExercise(Number(input.dataset.exerciseId), input.value);
-            const title = root.querySelector(`[data-title-for="${input.dataset.exerciseId}"]`);
-            if (title) title.textContent = input.value.trim();
-          } catch (error) {
-            alert(error.message);
-            reload();
-          }
-        });
+        input.addEventListener("input", () => saveExerciseField(input));
+        input.addEventListener("change", () => saveExerciseField(input));
       });
 
       root.querySelectorAll("[data-delete]").forEach((button) => {
         button.addEventListener("click", () => {
+          flushEdits(root);
           deleteExercise(Number(button.dataset.delete));
           reload();
         });
@@ -258,6 +271,7 @@ export async function cicloScreen({ id, cycleId }) {
 
       root.querySelectorAll("[data-move]").forEach((button) => {
         button.addEventListener("click", () => {
+          flushEdits(root);
           moveExercise(Number(button.dataset.move), Number(button.dataset.dir));
           reload();
         });

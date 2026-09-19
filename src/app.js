@@ -1,6 +1,7 @@
 import "./styles/app.css";
-import { bootDb } from "./database/connection.js";
+import { bootDb, persistNow } from "./database/connection.js";
 import { escapeHtml } from "./lib/html.js";
+import { flushEdits } from "./lib/flushEdits.js";
 import { parseRoute } from "./routes.js";
 import { bindNavigation, renderShell } from "./views/layout.js";
 import { homeScreen } from "./views/home.js";
@@ -26,6 +27,11 @@ const screens = {
 let lastPath = "";
 
 async function render() {
+  flushEdits();
+  persistNow().catch((error) => {
+    console.error("Falha ao gravar o SQLite", error);
+  });
+
   const root = document.querySelector("#app");
   const route = parseRoute();
   const currentScreen = root.querySelector(".screen");
@@ -49,8 +55,22 @@ async function render() {
   lastPath = route.path;
 }
 
+function bindPersist() {
+  const flush = () => {
+    flushEdits();
+    persistNow().catch((error) => {
+      console.error("Falha ao gravar o SQLite", error);
+    });
+  };
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flush();
+  });
+  window.addEventListener("pagehide", flush);
+}
+
 bootDb()
   .then(() => {
+    bindPersist();
     window.addEventListener("hashchange", render);
     return render();
   })

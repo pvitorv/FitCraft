@@ -138,7 +138,7 @@ export async function planoScreen({ id }) {
         <div class="kicker"><span class="dot"></span> ${daysLabel(plan.days_count)} · ${plan.days_count} ciclos</div>
         <label class="plan-title-field">
           <span class="sr-only">Nome do plano</span>
-          <input id="plan-name" maxlength="40" value="${escapeHtml(plan.name)}" />
+          <input id="plan-name" data-plan-id="${plan.id}" maxlength="40" value="${escapeHtml(plan.name)}" />
         </label>
         <p>Abra um dia para montar os exercícios e os tempos de preparação, treino e intervalo.</p>
         <div class="cta-row">
@@ -173,14 +173,17 @@ export async function planoScreen({ id }) {
     `,
     bind(root) {
       const planName = root.querySelector("#plan-name");
-      planName.addEventListener("change", () => {
+      const savePlanName = () => {
+        if (!planName.value.trim()) return;
         try {
           renamePlan(plan.id, planName.value);
         } catch (err) {
-          planName.value = plan.name;
+          planName.value = findPlan(plan.id).name;
           alert(err.message);
         }
-      });
+      };
+      planName.addEventListener("input", savePlanName);
+      planName.addEventListener("change", savePlanName);
 
       root.querySelector("#activate-plan")?.addEventListener("click", () => {
         activatePlan(plan.id);
