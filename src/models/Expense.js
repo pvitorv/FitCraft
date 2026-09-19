@@ -5,7 +5,7 @@ import { parseReais } from "../lib/money.js";
 export const EXPENSE_CATEGORIES = [
   { id: "academia", label: "Academia e aulas", color: "#ffd400" },
   { id: "alimentacao", label: "Alimentação", color: "#34d399" },
-  { id: "suplemento", label: "Suplementos", color: "#1f5cff" },
+  { id: "suplemento", label: "Suplementos", color: "#0057ff" },
   { id: "consulta", label: "Consulta e profissional", color: "#c084fc" },
   { id: "equipamento", label: "Equipamento", color: "#fb923c" },
   { id: "farmacia", label: "Farmácia e bem-estar", color: "#ff1a1a" },

@@ -20,7 +20,7 @@ function ringStyle(snapshot) {
     snapshot.phase?.type === "work"
       ? "#ff1a1a"
       : snapshot.phase?.type === "rest"
-        ? "#1f5cff"
+        ? "#0057ff"
         : "#ffd400";
   const percent = Math.max(2, Math.round((snapshot.progress || 0) * 100));
   return `conic-gradient(${color} ${percent}%, rgba(255,255,255,0.08) 0)`;

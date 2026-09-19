@@ -54,7 +54,7 @@ export async function homeScreen() {
           </article>
 
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 019</div>
+            <div class="kicker"><span class="dot"></span> Versão 020</div>
             <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan
@@ -83,7 +83,7 @@ export async function homeScreen() {
               <div><small>Minutos na semana</small><strong>${map.weekMinutes}</strong></div>
             </div>
             ${heatMap(map.items)}
-            ${barChart(map.weekdayCounts, ["#ffd400", "#ffd400", "#ff1a1a", "#ff1a1a", "#1f5cff", "#1f5cff", "#34d399"], WEEKDAYS.map((name) => name.slice(0, 3)))}
+            ${barChart(map.weekdayCounts, ["#ffd400", "#ffd400", "#ff1a1a", "#ff1a1a", "#0057ff", "#0057ff", "#34d399"], WEEKDAYS.map((name) => name.slice(0, 3)))}
             <p class="muted">Cada quadrado é um dia. O gráfico conta os treinos concluídos desta semana.</p>
           </article>
 
