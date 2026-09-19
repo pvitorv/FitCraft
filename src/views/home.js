@@ -1,36 +1,65 @@
-import { daysLabel } from "../lib/cycleNames.js";
+import { nowParts } from "../lib/calendar.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { formatClock } from "../lib/time.js";
-import { cycleRounds, firstCycle, firstTrainableCycle } from "../models/Cycle.js";
+import { cycleForToday, cycleRounds } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
+import { compressImage, getMotto, getProfilePhoto, setMotto, setProfilePhoto } from "../models/Profile.js";
 import { go } from "../routes.js";
 import { anyBorrowableCycle, openBorrowModal } from "./borrowModal.js";
 
+let clockTimer = null;
+let lastPhotoUrl = "";
+
 export async function homeScreen() {
   const plan = getActivePlan();
-  const cycle = plan ? firstCycle(plan.id) : null;
-  const trainable = plan ? firstTrainableCycle(plan.id) : null;
+  const now = nowParts();
+  const cycle = plan ? cycleForToday(plan) : null;
   const exercises = cycle ? listExercises(cycle.id) : [];
   const first = exercises[0] ?? null;
   const second = exercises[1] ?? null;
-  const canTrain = Boolean(trainable && listExercises(trainable.id).length);
+  const canTrain = Boolean(cycle && exercises.length);
+  const photo = await getProfilePhoto();
+  if (lastPhotoUrl) URL.revokeObjectURL(lastPhotoUrl);
+  const photoUrl = photo ? URL.createObjectURL(photo) : "";
+  lastPhotoUrl = photoUrl;
+  const motto = getMotto();
 
   return {
     html: `
       <section class="layout-split">
         <div>
+          <article class="profile-card">
+            <button type="button" class="avatar-btn" id="pick-photo" aria-label="Trocar foto de perfil">
+              ${
+                photoUrl
+                  ? `<img src="${photoUrl}" alt="Sua foto" />`
+                  : `<span class="avatar-fallback">${icons.camera}</span>`
+              }
+              <em>Trocar foto</em>
+            </button>
+            <div class="profile-copy">
+              <p class="kicker"><span class="dot"></span> <span data-now-date>${escapeHtml(now.dateLabel)}</span> · <span data-now-clock>${escapeHtml(now.clock)}</span></p>
+              <h2 data-now-hello>${escapeHtml(now.greeting)}, é ${escapeHtml(now.weekdayName.toLowerCase())}.</h2>
+              <label class="motto-field">
+                <span class="sr-only">Frase de efeito</span>
+                <textarea id="motto" maxlength="120" rows="2">${escapeHtml(motto)}</textarea>
+              </label>
+            </div>
+            <input id="photo-file" type="file" accept="image/*" hidden />
+          </article>
+
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 013</div>
-            <h2>Seu cronômetro de treino metabólico.</h2>
+            <div class="kicker"><span class="dot"></span> Versão 014</div>
+            <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan
-                ? `Plano ativo: <strong>${escapeHtml(plan.name)}</strong> · ${plan.days_count} ciclos · ${daysLabel(plan.days_count)}.`
+                ? `Plano ativo: <strong>${escapeHtml(plan.name)}</strong> · o app abre o ciclo de ${escapeHtml(now.weekdayName.toLowerCase())}, ${escapeHtml(now.clock)}. Reaproveitar outro dia é escolha sua.`
                 : "Crie um plano de 7, 15 ou 30 ciclos. Os dados ficam no SQLite deste aparelho."
             }</p>
             <div class="cta-row">
-              <button class="btn btn-primary" ${canTrain ? `data-go="/treino/${trainable.id}"` : "disabled"}>
+              <button class="btn btn-primary" ${canTrain ? `data-go="/treino/${cycle.id}"` : "disabled"}>
                 Treinar hoje
               </button>
               <button class="btn btn-ghost" type="button" id="borrow-open" ${anyBorrowableCycle() ? "" : "disabled"}>
@@ -66,12 +95,12 @@ export async function homeScreen() {
           ${
             plan
               ? `
-                <small>Hoje neste plano</small>
+                <small>Ciclo original de hoje</small>
                 <h3>${escapeHtml(cycle ? cycle.name : plan.name)}</h3>
                 <p class="muted">${
                   first
                     ? `${exercises.length} exercício${exercises.length === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · começa com ${escapeHtml(first.name)}.`
-                    : "Abra o ciclo e adicione os exercícios."
+                    : "Este é o dia do calendário. Monte os exercícios aqui — aproveitar outro dia fica por sua conta."
                 }</p>
               `
               : `
@@ -84,10 +113,43 @@ export async function homeScreen() {
       </section>
     `,
     bind(root) {
+      const clock = root.querySelector("[data-now-clock]");
+      const dateEl = root.querySelector("[data-now-date]");
+      const hello = root.querySelector("[data-now-hello]");
+      const tick = () => {
+        const next = nowParts();
+        if (clock) clock.textContent = next.clock;
+        if (dateEl) dateEl.textContent = next.dateLabel;
+        if (hello) hello.textContent = `${next.greeting}, é ${next.weekdayName.toLowerCase()}.`;
+      };
+      window.clearInterval(clockTimer);
+      clockTimer = window.setInterval(tick, 15000);
+
+      root.querySelector("#motto")?.addEventListener("input", (event) => {
+        setMotto(event.target.value);
+      });
+      root.querySelector("#motto")?.addEventListener("change", (event) => {
+        event.target.value = setMotto(event.target.value);
+      });
+
+      const picker = root.querySelector("#photo-file");
+      root.querySelector("#pick-photo")?.addEventListener("click", () => picker?.click());
+      picker?.addEventListener("change", async () => {
+        const file = picker.files?.[0];
+        picker.value = "";
+        if (!file) return;
+        try {
+          await setProfilePhoto(await compressImage(file));
+          go("/");
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+
       root.querySelector("#borrow-open")?.addEventListener("click", () => {
         openBorrowModal({
-          currentCycleId: trainable?.id,
-          onPick: (cycle) => go(`/treino/${cycle.id}`),
+          currentCycleId: cycle?.id,
+          onPick: (picked) => go(`/treino/${picked.id}`),
         });
       });
     },

@@ -2,6 +2,7 @@ import { daysLabel } from "../lib/cycleNames.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { activatePlan, createPlan, deletePlan, findPlan, listPlans, renamePlan } from "../models/Plan.js";
+import { cycleDayIndex } from "../lib/calendar.js";
 import { cycleRounds, listCycles } from "../models/Cycle.js";
 import { go } from "../routes.js";
 
@@ -130,6 +131,7 @@ export async function planoScreen({ id }) {
   }
 
   const cycles = listCycles(plan.id);
+  const todayIndex = cycleDayIndex(plan.days_count);
 
   return {
     html: `
@@ -155,10 +157,10 @@ export async function planoScreen({ id }) {
           .map(
             (cycle) => `
               <li>
-                <div class="cycle-item cycle-link">
+                <div class="cycle-item cycle-link ${cycle.day_index === todayIndex ? "is-today" : ""}">
                   <span class="cycle-index">${String(cycle.day_index + 1).padStart(2, "0")}</span>
                   <div class="cycle-copy">
-                    <strong>${escapeHtml(cycle.name)}</strong>
+                    <strong>${escapeHtml(cycle.name)}${cycle.day_index === todayIndex ? " · hoje" : ""}</strong>
                     <p class="muted">${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
                   </div>
                   <button class="btn btn-ghost" type="button" data-go="/planos/${plan.id}/ciclos/${cycle.id}">

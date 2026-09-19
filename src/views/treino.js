@@ -1,7 +1,7 @@
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { formatClock } from "../lib/time.js";
-import { findCycle, firstTrainableCycle } from "../models/Cycle.js";
+import { cycleForToday, findCycle } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { findPlan, getActivePlan } from "../models/Plan.js";
 import { playCues, resetCues, unlockCues } from "../services/cues.js";
@@ -80,9 +80,9 @@ function paint(root, snapshot, exercises) {
 export async function treinoScreen(params) {
   const plan = getActivePlan();
   const requested = params.cycleId ? findCycle(params.cycleId) : null;
-  const cycle = requested ?? (plan ? firstTrainableCycle(plan.id) : null);
+  const planned = plan ? cycleForToday(plan) : null;
+  const cycle = requested ?? planned;
   const cyclePlan = cycle ? findPlan(cycle.plan_id) : null;
-  const planned = plan ? firstTrainableCycle(plan.id) : null;
   const borrowedPlan = Boolean(cycle && plan && cycle.plan_id !== plan.id);
   const borrowedDay = Boolean(cycle && planned && cycle.id !== planned.id);
   const exercises = cycle ? listExercises(cycle.id) : [];

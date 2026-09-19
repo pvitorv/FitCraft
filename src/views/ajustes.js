@@ -40,9 +40,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 013 — playlists Summer Eletrohits</p>
+            <p class="muted">FitCraft 014 — calendário, foto e frase</p>
           </div>
-          <strong>013</strong>
+          <strong>014</strong>
         </div>
       </div>
     `,

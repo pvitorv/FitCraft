@@ -6,6 +6,7 @@ const IDB_NAME = "fitcraft";
 const STORE = "kv";
 const DB_KEY = "sqlite";
 const AUDIO_PREFIX = "audio:";
+const BLOB_PREFIX = "blob:";
 
 let database = null;
 let persistTimer = null;
@@ -144,6 +145,26 @@ export async function getAudio(key) {
   return new Promise((resolve, reject) => {
     const tx = idb.transaction(STORE, "readonly");
     const request = tx.objectStore(STORE).get(AUDIO_PREFIX + key);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function putBlob(key, blob) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(blob, BLOB_PREFIX + key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+export async function getBlob(key) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readonly");
+    const request = tx.objectStore(STORE).get(BLOB_PREFIX + key);
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
   });

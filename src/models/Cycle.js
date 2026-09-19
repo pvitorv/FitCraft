@@ -1,4 +1,5 @@
 import { all, get, run } from "../database/connection.js";
+import { cycleDayIndex } from "../lib/calendar.js";
 import { clampSeconds } from "../lib/time.js";
 
 export function listCycles(planId) {
@@ -26,6 +27,13 @@ export function firstTrainableCycle(planId) {
   return (
     listCycles(planId).find((cycle) => cycle.exercise_count > 0) ?? firstCycle(planId)
   );
+}
+
+export function cycleForToday(plan, date = new Date()) {
+  if (!plan) return null;
+  const cycles = listCycles(plan.id);
+  const index = cycleDayIndex(plan.days_count, date);
+  return cycles.find((cycle) => cycle.day_index === index) ?? firstCycle(plan.id);
 }
 
 export function findCycle(id) {
