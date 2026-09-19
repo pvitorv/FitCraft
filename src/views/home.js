@@ -2,7 +2,7 @@ import { daysLabel } from "../lib/cycleNames.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { formatClock } from "../lib/time.js";
-import { firstCycle, firstTrainableCycle } from "../models/Cycle.js";
+import { cycleRounds, firstCycle, firstTrainableCycle } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
 
@@ -20,7 +20,7 @@ export async function homeScreen() {
       <section class="layout-split">
         <div>
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 005</div>
+            <div class="kicker"><span class="dot"></span> Versão 006</div>
             <h2>Seu cronômetro de treino metabólico.</h2>
             <p>${
               plan
@@ -65,7 +65,7 @@ export async function homeScreen() {
                 <h3>${escapeHtml(cycle ? cycle.name : plan.name)}</h3>
                 <p class="muted">${
                   first
-                    ? `${exercises.length} exercício${exercises.length === 1 ? "" : "s"} · começa com ${escapeHtml(first.name)}.`
+                    ? `${exercises.length} exercício${exercises.length === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · começa com ${escapeHtml(first.name)}.`
                     : "Abra o ciclo e adicione os exercícios."
                 }</p>
               `

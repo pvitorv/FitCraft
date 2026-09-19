@@ -56,3 +56,12 @@ export function setCycleTimes(id, { prepSeconds, restSeconds }) {
     id,
   ]);
 }
+
+export function setCycleRounds(id, rounds) {
+  const value = Math.min(30, Math.max(1, Math.round(Number(rounds) || 1)));
+  run("UPDATE cycles SET rounds = ? WHERE id = ?", [value, id]);
+}
+
+export function cycleRounds(cycle) {
+  return Math.min(30, Math.max(1, Number(cycle?.rounds) || 1));
+}

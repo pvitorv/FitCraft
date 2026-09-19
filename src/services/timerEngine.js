@@ -1,6 +1,13 @@
+export function cycleSignature(cycle, exercises) {
+  return `${cycle.id}:${cycle.prep_seconds}:${cycle.rest_seconds}:${cycle.rounds}:${exercises
+    .map((item) => `${item.id}-${item.work_seconds}-${item.name}`)
+    .join("|")}`;
+}
+
 export function buildPhases(cycle, exercises) {
   if (!cycle || !exercises.length) return [];
 
+  const rounds = Math.min(30, Math.max(1, Number(cycle.rounds) || 1));
   const phases = [
     {
       type: "prep",
@@ -9,30 +16,43 @@ export function buildPhases(cycle, exercises) {
       title: exercises[0].name,
       hint: "Aquecimento. O primeiro movimento já aparece.",
       exerciseIndex: 0,
+      round: 1,
+      rounds,
     },
   ];
 
-  exercises.forEach((exercise, index) => {
-    phases.push({
-      type: "work",
-      label: "Treino",
-      seconds: exercise.work_seconds,
-      title: exercise.name,
-      hint: "Trabalhe agora.",
-      exerciseIndex: index,
-    });
+  for (let round = 0; round < rounds; round += 1) {
+    exercises.forEach((exercise, index) => {
+      phases.push({
+        type: "work",
+        label: "Treino",
+        seconds: exercise.work_seconds,
+        title: exercise.name,
+        hint: rounds > 1 ? `Série ${round + 1} de ${rounds}. Trabalhe agora.` : "Trabalhe agora.",
+        exerciseIndex: index,
+        round: round + 1,
+        rounds,
+      });
 
-    if (index < exercises.length - 1) {
+      const lastExercise = index === exercises.length - 1;
+      const lastRound = round === rounds - 1;
+      if (lastExercise && lastRound) return;
+
+      const next = lastExercise ? exercises[0] : exercises[index + 1];
       phases.push({
         type: "rest",
         label: "Intervalo",
         seconds: cycle.rest_seconds,
-        title: exercises[index + 1].name,
-        hint: "Descanse. Em seguida vem este exercício.",
+        title: next.name,
+        hint: lastExercise
+          ? `Descanso. Em seguida começa a série ${round + 2}.`
+          : "Descanse. Em seguida vem este exercício.",
         exerciseIndex: index,
+        round: round + 1,
+        rounds,
       });
-    }
-  });
+    });
+  }
 
   return phases;
 }
@@ -43,6 +63,7 @@ function createEngine() {
 
   const state = {
     cycleId: null,
+    signature: "",
     phases: [],
     index: 0,
     remainingMs: 0,
@@ -60,6 +81,7 @@ function createEngine() {
     const totalMs = (phase?.seconds ?? 1) * 1000;
     return {
       cycleId: state.cycleId,
+      signature: state.signature,
       phases: state.phases,
       index: state.index,
       phase,
@@ -135,6 +157,7 @@ function createEngine() {
     load(cycle, exercises) {
       stopRaf();
       state.cycleId = cycle.id;
+      state.signature = cycleSignature(cycle, exercises);
       state.phases = buildPhases(cycle, exercises);
       state.running = false;
       state.ended = state.phases.length === 0;

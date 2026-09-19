@@ -41,7 +41,11 @@ async function writeBytes(bytes) {
 }
 
 export async function bootDb() {
-  if (database) return database;
+  if (database) {
+    migrate(database);
+    schedulePersist();
+    return database;
+  }
 
   const SQL = await initSqlJs({ locateFile: () => wasmUrl });
   const saved = await readBytes();

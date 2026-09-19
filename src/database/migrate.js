@@ -1,3 +1,8 @@
+function columnNames(database, table) {
+  const result = database.exec(`PRAGMA table_info(${table})`);
+  return result[0]?.values.map((row) => row[1]) ?? [];
+}
+
 export function migrate(database) {
   database.run(`
     CREATE TABLE IF NOT EXISTS settings (
@@ -20,6 +25,7 @@ export function migrate(database) {
       prep_seconds INTEGER NOT NULL DEFAULT 10,
       work_seconds INTEGER NOT NULL DEFAULT 40,
       rest_seconds INTEGER NOT NULL DEFAULT 20,
+      rounds INTEGER NOT NULL DEFAULT 1,
       FOREIGN KEY (plan_id) REFERENCES plans(id) ON DELETE CASCADE
     );
 
@@ -36,4 +42,8 @@ export function migrate(database) {
 
     CREATE INDEX IF NOT EXISTS idx_exercises_cycle ON exercises(cycle_id, sort_order);
   `);
+
+  if (!columnNames(database, "cycles").includes("rounds")) {
+    database.run("ALTER TABLE cycles ADD COLUMN rounds INTEGER NOT NULL DEFAULT 1");
+  }
 }

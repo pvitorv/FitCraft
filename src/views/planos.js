@@ -2,7 +2,7 @@ import { daysLabel } from "../lib/cycleNames.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { activatePlan, createPlan, deletePlan, findPlan, listPlans, renamePlan } from "../models/Plan.js";
-import { listCycles } from "../models/Cycle.js";
+import { cycleRounds, listCycles } from "../models/Cycle.js";
 import { go } from "../routes.js";
 
 export async function planosScreen() {
@@ -159,7 +159,7 @@ export async function planoScreen({ id }) {
                   <span class="cycle-index">${String(cycle.day_index + 1).padStart(2, "0")}</span>
                   <div class="cycle-copy">
                     <strong>${escapeHtml(cycle.name)}</strong>
-                    <p class="muted">${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
+                    <p class="muted">${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
                   </div>
                   ${icons.chevron}
                 </button>

@@ -12,7 +12,8 @@ export function formatClock(seconds) {
 }
 
 export function cycleDuration(cycle, exercises) {
-  const work = exercises.reduce((sum, exercise) => sum + exercise.work_seconds, 0);
-  const rests = Math.max(0, exercises.length - 1) * cycle.rest_seconds;
+  const rounds = Math.min(30, Math.max(1, Number(cycle.rounds) || 1));
+  const work = exercises.reduce((sum, exercise) => sum + exercise.work_seconds, 0) * rounds;
+  const rests = Math.max(0, exercises.length * rounds - 1) * cycle.rest_seconds;
   return cycle.prep_seconds + work + rests;
 }

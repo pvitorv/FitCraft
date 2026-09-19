@@ -40,9 +40,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 005 — timer metabólico</p>
+            <p class="muted">FitCraft 006 — repetições da sequência</p>
           </div>
-          <strong>005</strong>
+          <strong>006</strong>
         </div>
       </div>
     `,

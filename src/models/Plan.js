@@ -41,8 +41,8 @@ export function createPlan(name, daysCount) {
   names.forEach((cycleName, index) => {
     run(
       `
-        INSERT INTO cycles (plan_id, name, day_index, prep_seconds, work_seconds, rest_seconds)
-        VALUES (?, ?, ?, 10, 40, 20)
+        INSERT INTO cycles (plan_id, name, day_index, prep_seconds, work_seconds, rest_seconds, rounds)
+        VALUES (?, ?, ?, 10, 40, 20, 1)
       `,
       [id, cycleName, index],
     );

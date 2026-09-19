@@ -770,6 +770,30 @@ button.row {
   margin: 4px 0 0;
 }
 
+.rounds-card {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr minmax(150px, 180px);
+  gap: 16px;
+  align-items: center;
+  border-color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.rounds-card small {
+  color: var(--yellow);
+}
+
+.rounds-card p {
+  margin: 6px 0 0;
+}
+
+@media (max-width: 699px) {
+  .rounds-card {
+    grid-template-columns: 1fr;
+  }
+}
+
 .section-head {
   display: flex;
   align-items: center;

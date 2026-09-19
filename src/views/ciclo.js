@@ -1,7 +1,7 @@
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { cycleDuration, formatClock } from "../lib/time.js";
-import { findCycle, setCycleTimes, renameCycle } from "../models/Cycle.js";
+import { cycleRounds, findCycle, renameCycle, setCycleRounds, setCycleTimes } from "../models/Cycle.js";
 import {
   addExercise,
   deleteExercise,
@@ -13,12 +13,14 @@ import {
 import { findPlan } from "../models/Plan.js";
 import { go } from "../routes.js";
 
-function stepper(kind, seconds, extra = "") {
+function stepper(kind, value, extra = "", format = "clock") {
+  const shown = format === "clock" ? formatClock(value) : `${value}×`;
+  const step = format === "clock" ? 5 : 1;
   return `
     <div class="stepper" data-kind="${kind}" ${extra}>
-      <button type="button" data-delta="-5" aria-label="Diminuir">−</button>
-      <strong>${formatClock(seconds)}</strong>
-      <button type="button" data-delta="5" aria-label="Aumentar">+</button>
+      <button type="button" data-delta="-${step}" aria-label="Diminuir">−</button>
+      <strong>${shown}</strong>
+      <button type="button" data-delta="${step}" aria-label="Aumentar">+</button>
     </div>
   `;
 }
@@ -40,6 +42,7 @@ export async function cicloScreen({ id, cycleId }) {
 
   const exercises = listExercises(cycle.id);
   const nextName = exercises[1]?.name ?? "Próximo exercício";
+  const rounds = cycleRounds(cycle);
   const total = cycleDuration(cycle, exercises);
 
   return {
@@ -51,8 +54,17 @@ export async function cicloScreen({ id, cycleId }) {
           <span class="sr-only">Nome do ciclo</span>
           <input id="cycle-name" maxlength="32" value="${escapeHtml(cycle.name)}" />
         </label>
-        <p>Preparação e intervalo valem para o dia todo. Cada exercício tem o próprio tempo de treino.</p>
-        <p class="muted">Duração estimada: <strong>${formatClock(total)}</strong></p>
+        <p>Preparação e intervalo valem para o dia todo. A sequência de exercícios se repete quantas vezes você quiser.</p>
+        <p class="muted">Duração estimada: <strong>${formatClock(total)}</strong>${rounds > 1 ? ` · ${rounds} séries` : ""}</p>
+      </article>
+
+      <article class="card rounds-card">
+        <div>
+          <small>Repetições da sequência</small>
+          <strong>Quantas vezes o circuito roda</strong>
+          <p class="muted">Burpee → intervalo → Mountain → intervalo → … e recomeça. Entre o último e o primeiro de novo também tem intervalo.</p>
+        </div>
+        ${stepper("rounds", rounds, "", "count")}
       </article>
 
       <div class="grid cols-3" style="margin-top:16px">
@@ -131,7 +143,9 @@ export async function cicloScreen({ id, cycleId }) {
           const stepperEl = button.closest(".stepper");
           const delta = Number(button.dataset.delta);
           const kind = stepperEl.dataset.kind;
-          if (kind === "prep") {
+          if (kind === "rounds") {
+            setCycleRounds(cycle.id, rounds + delta);
+          } else if (kind === "prep") {
             setCycleTimes(cycle.id, {
               prepSeconds: cycle.prep_seconds + delta,
               restSeconds: cycle.rest_seconds,

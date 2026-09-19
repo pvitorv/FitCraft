@@ -5,7 +5,7 @@ import { findCycle, firstTrainableCycle, listCycles } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
 import { playCues, resetCues, unlockCues } from "../services/cues.js";
-import { timerEngine } from "../services/timerEngine.js";
+import { cycleSignature, timerEngine } from "../services/timerEngine.js";
 import { keepAwake, releaseAwake } from "../services/wakeLock.js";
 import { go } from "../routes.js";
 
@@ -43,7 +43,9 @@ function paint(root, snapshot, exercises) {
   root.querySelector("[data-ring]").style.background = ringStyle(snapshot);
   root.querySelector("[data-progress]").textContent = snapshot.ended
     ? "Sessão completa"
-    : `Fase ${snapshot.index + 1} de ${snapshot.total || 1}`;
+    : phase?.rounds > 1
+      ? `Fase ${snapshot.index + 1} de ${snapshot.total} · série ${phase.round} de ${phase.rounds}`
+      : `Fase ${snapshot.index + 1} de ${snapshot.total || 1}`;
 
   const main = root.querySelector("[data-main]");
   if (snapshot.ended) main.textContent = "Recomeçar";
@@ -63,10 +65,10 @@ function paint(root, snapshot, exercises) {
         : phase?.type === "work"
           ? phase.exerciseIndex
           : phase?.type === "rest"
-            ? phase.exerciseIndex + 1
+            ? (phase.exerciseIndex + 1) % Math.max(exercises.length, 1)
             : -1;
     item.classList.toggle("is-current", !snapshot.ended && index === current);
-    item.classList.toggle("is-done", snapshot.ended || index < current);
+    item.classList.toggle("is-done", (phase?.rounds ?? 1) <= 1 && (snapshot.ended || index < current));
   });
 
   playCues(snapshot);
@@ -84,11 +86,13 @@ export async function treinoScreen(params) {
         : null;
   const exercises = cycle ? listExercises(cycle.id) : [];
 
-  if (cycle && timerEngine.snapshot().cycleId !== cycle.id) {
-    timerEngine.load(cycle, exercises);
-    resetCues();
-  } else if (cycle && !timerEngine.snapshot().phases.length) {
-    timerEngine.load(cycle, exercises);
+  if (cycle) {
+    const snap = timerEngine.snapshot();
+    const signature = cycleSignature(cycle, exercises);
+    if (!snap.running && (snap.cycleId !== cycle.id || snap.signature !== signature || !snap.phases.length)) {
+      timerEngine.load(cycle, exercises);
+      resetCues();
+    }
   }
 
   return {
