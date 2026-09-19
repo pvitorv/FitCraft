@@ -2,19 +2,21 @@
 
 App Android **offline** de ciclos metabólicos (preparação, treino e intervalo). Sem loja, sem servidor. Você instala o APK no celular.
 
-Versão atual do código: **015** (arquivo `.fitcraft` para enviar um ciclo).
+Versão atual do código: **016** (fornecedor CriaSysWeb no APK).
 
 ## Como testar no celular (sem emulador)
 
 1. Abra **https://github.com/pvitorv/FitCraft**.
 2. Clique na aba **Actions** (ao lado de Code, Issues, Pull requests).
 3. Na esquerda, clique em **Build APK**.
-4. Abra a execução mais recente da branch **015**.
+4. Abra a execução mais recente da branch **016**.
 5. Espere o ✓ verde (pode levar até 15 minutos). Se estiver X vermelho, avise.
-6. No final da página, em **Artifacts**, baixe `fitcraft-015`.
-7. O GitHub manda um **zip**. Abra, pegue o `fitcraft-015.apk`.
+6. No final da página, em **Artifacts**, baixe `fitcraft-016`.
+7. O GitHub manda um **zip**. Abra, pegue o `fitcraft-016.apk`.
 8. Mande o APK para o celular (WhatsApp, Telegram, Drive ou cabo).
 9. No celular: abra o arquivo → **Instalar**. Se pedir, permita **fontes desconhecidas** só para este app.
+
+Se a 015 já estiver instalada, **apague o FitCraft antigo primeiro**. A 016 usa outro certificado (CriaSysWeb / Paulo Vitor Vaz) e o Android recusa atualizar em cima do APK de teste.
 
 Se aparecer X vermelho, abra o log e me avise. Você não precisa mexer no Actions.
 
@@ -46,7 +48,8 @@ Sempre sequenciais: `001`, `002`, `003`…
 - `013` — playlists Summer Eletrohits 1, 2 e 3
 - `014` — dia de hoje, foto de perfil e frase
 - `015` — arquivo `.fitcraft` para enviar um ciclo
-- `016` — polimento
+- `016` — fornecedor CriaSysWeb / Paulo Vitor Vaz no APK
+- `017` — polimento
 
 O `main` só avança quando aquela versão rodou no seu aparelho.
 

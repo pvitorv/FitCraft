@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 015 — arquivo .fitcraft para enviar um ciclo</p>
+            <p class="muted">FitCraft 016 — arquivo .fitcraft para enviar um ciclo</p>
           </div>
-          <strong>015</strong>
+          <strong>016</strong>
         </div>
       </div>
     `,
