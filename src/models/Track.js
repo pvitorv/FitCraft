@@ -82,11 +82,41 @@ export async function importTracks(playlistId, fileList) {
   }
 }
 
+export function addPlaceholderTracks(playlistId, items) {
+  const current = listTracks(playlistId);
+  const room = MAX_TRACKS - current.length;
+  if (room <= 0) {
+    throw new Error("Esta playlist já tem 15 faixas.");
+  }
+
+  let nextOrder = get(
+    "SELECT COALESCE(MAX(sort_order), -1) + 1 AS next FROM tracks WHERE playlist_id = ?",
+    [playlistId],
+  ).next;
+
+  items.slice(0, room).forEach((item) => {
+    const name = String(item.name || "Faixa").trim().slice(0, 80) || "Faixa";
+    const key = `pending-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    run(
+      `
+        INSERT INTO tracks (playlist_id, name, mime, duration_seconds, file_key, sort_order)
+        VALUES (?, ?, 'audio/mpeg', ?, ?, ?)
+      `,
+      [playlistId, name, Math.max(0, Math.round(Number(item.durationSeconds) || 0)), key, nextOrder],
+    );
+    nextOrder += 1;
+  });
+}
+
+export function isPendingTrack(track) {
+  return String(track?.file_key || "").startsWith("pending-");
+}
+
 export async function deleteTrack(id) {
   const track = findTrack(id);
   if (!track) return;
   run("DELETE FROM tracks WHERE id = ?", [id]);
-  await deleteAudio(track.file_key);
+  if (!isPendingTrack(track)) await deleteAudio(track.file_key);
 }
 
 export function moveTrack(id, direction) {

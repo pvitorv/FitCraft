@@ -34,7 +34,7 @@ function tracksOfActive() {
   return id ? listTracks(id) : [];
 }
 
-async function loadIndex(nextIndex, { autoplay = false } = {}) {
+async function loadIndex(nextIndex, { autoplay = false, hops = 0 } = {}) {
   const tracks = tracksOfActive();
   if (!tracks.length) {
     audio.pause();
@@ -48,8 +48,13 @@ async function loadIndex(nextIndex, { autoplay = false } = {}) {
 
   index = ((nextIndex % tracks.length) + tracks.length) % tracks.length;
   const track = tracks[index];
-  const blob = await getAudio(track.file_key);
+  const blob = String(track.file_key || "").startsWith("pending-")
+    ? null
+    : await getAudio(track.file_key);
   if (!blob) {
+    if (hops + 1 < tracks.length) {
+      return loadIndex(index + 1, { autoplay, hops: hops + 1 });
+    }
     emit();
     return;
   }

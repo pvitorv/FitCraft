@@ -10,6 +10,8 @@ import {
 } from "../models/Playlist.js";
 import { deleteTrack, importTracks, listTracks, moveTrack } from "../models/Track.js";
 import { go } from "../routes.js";
+import { isAbortError, pickCycleFile, applyPlaylistPack, readPlaylistPackFromFile } from "../lib/playlistPack.js";
+import { shareOrSavePlaylist } from "../services/shareCycle.js";
 import {
   nextTrack,
   pauseMusic,
@@ -91,7 +93,10 @@ async function playlistHome() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Playlist local</div>
         <h2>Summer Eletrohits no aparelho.</h2>
-        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém.</p>
+        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém. O envio .fitcraft leva só os nomes das faixas, nunca o áudio.</p>
+        <div class="cta-row">
+          <button class="btn btn-ghost" type="button" id="import-playlist">${icons.share} Receber playlist</button>
+        </div>
         <div class="cta-row">
           <button type="button" class="row music-switch" data-music-enabled-wrap>
             <div>
@@ -133,6 +138,20 @@ async function playlistHome() {
           go("/playlist");
         });
       });
+      root.querySelector("#import-playlist")?.addEventListener("click", async () => {
+        try {
+          const file = await pickCycleFile();
+          const pack = await readPlaylistPackFromFile(file);
+          const created = applyPlaylistPack(pack);
+          alert(
+            `Playlist “${created.name}” chegou com ${pack.playlist.tracks.length} nomes. Importe os arquivos de áudio que você já tem — o FitCraft não envia música.`,
+          );
+          go(`/playlist/${created.id}`);
+        } catch (error) {
+          if (isAbortError(error)) return;
+          alert(error.message);
+        }
+      });
     },
   };
 }
@@ -165,6 +184,9 @@ async function playlistDetail(id) {
           <button class="btn btn-primary" type="button" id="import-tracks" ${full ? "disabled" : ""}>
             ${icons.plus} Importar faixas
           </button>
+          <button class="btn btn-ghost" type="button" data-share-playlist ${tracks.length ? "" : "disabled"}>
+            ${icons.share} Enviar .fitcraft
+          </button>
           <button class="btn ${active ? "btn-primary" : "btn-ghost"}" type="button" data-use="${playlist.id}">
             ${active ? `${icons.check} Em uso` : "Usar esta"}
           </button>
@@ -183,7 +205,9 @@ async function playlistDetail(id) {
                         <span class="cycle-index">${String(index + 1).padStart(2, "0")}</span>
                         <span>
                           <strong>${escapeHtml(track.name)}</strong>
-                          <em>${track.duration_seconds ? formatClock(track.duration_seconds) : "áudio"}</em>
+                          <em>${
+                            track.duration_seconds ? formatClock(track.duration_seconds) : "áudio"
+                          }${String(track.file_key || "").startsWith("pending-") ? " · falta importar o arquivo" : ""}</em>
                         </span>
                       </button>
                       <div class="track-tools">
@@ -224,6 +248,18 @@ async function playlistDetail(id) {
       root.querySelector("[data-use]")?.addEventListener("click", () => {
         usePlaylist(playlist.id);
         go(`/playlist/${playlist.id}`);
+      });
+
+      root.querySelector("[data-share-playlist]")?.addEventListener("click", async () => {
+        try {
+          const result = await shareOrSavePlaylist(playlist.id);
+          if (result === "downloaded") {
+            alert("Arquivo .fitcraft salvo. Ele leva só os nomes das faixas, não o áudio.");
+          }
+        } catch (error) {
+          if (isAbortError(error)) return;
+          alert(error.message);
+        }
       });
 
       root.querySelectorAll("[data-play]").forEach((button) => {

@@ -60,6 +60,42 @@ export function migrate(database) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_tracks_playlist ON tracks(playlist_id, sort_order);
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cycle_id INTEGER,
+      plan_id INTEGER,
+      cycle_name TEXT NOT NULL,
+      plan_name TEXT NOT NULL DEFAULT '',
+      completed_at TEXT NOT NULL,
+      duration_seconds INTEGER NOT NULL DEFAULT 0,
+      exercise_count INTEGER NOT NULL DEFAULT 0,
+      rounds INTEGER NOT NULL DEFAULT 1
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_sessions_done ON sessions(completed_at);
+
+    CREATE TABLE IF NOT EXISTS expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      spent_on TEXT NOT NULL,
+      category TEXT NOT NULL,
+      amount_cents INTEGER NOT NULL,
+      note TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(spent_on);
+
+    CREATE TABLE IF NOT EXISTS meals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      day_date TEXT NOT NULL,
+      slot TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      notes TEXT NOT NULL DEFAULT '',
+      UNIQUE(day_date, slot)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_meals_day ON meals(day_date);
   `);
 
   if (!columnNames(database, "cycles").includes("rounds")) {

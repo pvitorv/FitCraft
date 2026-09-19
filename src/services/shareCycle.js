@@ -2,6 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { buildCyclePack, fileNameForPack, stringifyCyclePack } from "../lib/cyclePack.js";
+import { buildPlaylistPack, fileNameForPlaylistPack } from "../lib/playlistPack.js";
 
 function downloadText(name, body) {
   const blob = new Blob([body], { type: "application/json" });
@@ -14,25 +15,6 @@ function downloadText(name, body) {
   link.click();
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 2000);
-}
-
-async function shareNative(name, body, title) {
-  await Filesystem.writeFile({
-    path: name,
-    data: body,
-    directory: Directory.Cache,
-    encoding: Encoding.UTF8,
-  });
-  const { uri } = await Filesystem.getUri({
-    path: name,
-    directory: Directory.Cache,
-  });
-  await Share.share({
-    title,
-    text: title,
-    files: [uri],
-    dialogTitle: "Enviar ciclo FitCraft",
-  });
 }
 
 async function shareWebFile(name, body, title) {
@@ -48,14 +30,24 @@ async function shareWebFile(name, body, title) {
   return true;
 }
 
-export async function shareOrSaveCycle(cycleId) {
-  const pack = buildCyclePack(cycleId);
-  const body = stringifyCyclePack(pack);
-  const name = fileNameForPack(pack);
-  const title = `Ciclo FitCraft: ${pack.cycle.name}`;
-
+export async function shareOrSaveText(name, body, title, dialogTitle = "Enviar FitCraft") {
   if (Capacitor.isNativePlatform()) {
-    await shareNative(name, body, title);
+    await Filesystem.writeFile({
+      path: name,
+      data: body,
+      directory: Directory.Cache,
+      encoding: Encoding.UTF8,
+    });
+    const { uri } = await Filesystem.getUri({
+      path: name,
+      directory: Directory.Cache,
+    });
+    await Share.share({
+      title,
+      text: title,
+      files: [uri],
+      dialogTitle,
+    });
     return "shared";
   }
 
@@ -71,4 +63,20 @@ export async function shareOrSaveCycle(cycleId) {
 
   downloadText(name, body);
   return "downloaded";
+}
+
+export async function shareOrSaveCycle(cycleId) {
+  const pack = buildCyclePack(cycleId);
+  const body = stringifyCyclePack(pack);
+  const name = fileNameForPack(pack);
+  const title = `Ciclo FitCraft: ${pack.cycle.name}`;
+  return shareOrSaveText(name, body, title, "Enviar ciclo FitCraft");
+}
+
+export async function shareOrSavePlaylist(playlistId) {
+  const pack = buildPlaylistPack(playlistId);
+  const body = `${JSON.stringify(pack, null, 2)}\n`;
+  const name = fileNameForPlaylistPack(pack);
+  const title = `Playlist FitCraft: ${pack.playlist.name}`;
+  return shareOrSaveText(name, body, title, "Enviar playlist FitCraft");
 }

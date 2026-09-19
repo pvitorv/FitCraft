@@ -1,4 +1,4 @@
-import { all, get, run } from "../database/connection.js";
+import { all, get, lastId, run } from "../database/connection.js";
 import { getSetting, setSetting } from "./Setting.js";
 
 export const MAX_TRACKS = 15;
@@ -50,4 +50,11 @@ export function isMusicEnabled() {
 
 export function setMusicEnabled(on) {
   setSetting("music_enabled", on ? "1" : "0");
+}
+
+export function createPlaylist(name) {
+  const trimmed = String(name || "").trim().slice(0, 60) || "Playlist recebida";
+  const slug = `user-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+  run("INSERT INTO playlists (slug, name) VALUES (?, ?)", [slug, trimmed]);
+  return findPlaylist(lastId());
 }

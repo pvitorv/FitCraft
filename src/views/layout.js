@@ -5,8 +5,9 @@ const nav = [
   { path: "/", id: "home", label: "Início", icon: icons.home },
   { path: "/planos", id: "planos", label: "Planos", icon: icons.plans },
   { path: "/treino", id: "treino", label: "Treino", icon: icons.timer },
-  { path: "/playlist", id: "playlist", label: "Playlist", icon: icons.music },
-  { path: "/ajustes", id: "ajustes", label: "Ajustes", icon: icons.settings },
+  { path: "/nutricao", id: "nutricao", label: "Nutri", icon: icons.apple },
+  { path: "/financeiro", id: "financeiro", label: "Gastos", icon: icons.wallet },
+  { path: "/mais", id: "mais", label: "Mais", icon: icons.more },
 ];
 
 export function renderShell(innerHtml) {
@@ -22,10 +23,10 @@ export function renderShell(innerHtml) {
             <p>Timer metabólico offline</p>
           </div>
         </div>
-        <span class="version-chip">017</span>
+        <span class="version-chip">018</span>
       </header>
       <main class="screen">${innerHtml}</main>
-      <nav class="bottom-nav">
+      <nav class="bottom-nav is-six">
         ${nav
           .map(
             (item) => `

@@ -50,6 +50,42 @@ export function dateLabel(date = new Date()) {
   return `${WEEKDAYS_LONG[index]}, ${date.getDate()} de ${MONTHS[date.getMonth()]}`;
 }
 
+export function isoDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function parseIsoDate(value) {
+  const [year, month, day] = String(value || "").split("-").map(Number);
+  if (!year || !month || !day) return new Date();
+  return new Date(year, month - 1, day);
+}
+
+export function addDays(date, amount) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+export function startOfWeek(date = new Date()) {
+  const next = new Date(date);
+  next.setHours(0, 0, 0, 0);
+  next.setDate(next.getDate() - weekdayIndex(next));
+  return next;
+}
+
+export function startOfMonth(date = new Date()) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+export function monthLabel(date = new Date()) {
+  return `${MONTHS[date.getMonth()]} de ${date.getFullYear()}`;
+}
+
+export { WEEKDAYS, MONTHS };
+
 export function nowParts(date = new Date()) {
   const index = weekdayIndex(date);
   return {

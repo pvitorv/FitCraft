@@ -1,6 +1,7 @@
 import { renameCycle } from "../models/Cycle.js";
 import { renameExercise } from "../models/Exercise.js";
 import { renamePlan } from "../models/Plan.js";
+import { upsertMeal } from "../models/Nutrition.js";
 import { setMotto } from "../models/Profile.js";
 
 function saveName(action) {
@@ -33,5 +34,15 @@ export function flushEdits(root = document) {
       const title = root.querySelector(`[data-title-for="${id}"]`);
       if (title) title.textContent = field.value.trim();
     }
+  });
+
+  const mealTitles = [...root.querySelectorAll(".meal-title")];
+  mealTitles.forEach((field) => {
+    if (!field.dataset.date || !field.dataset.slot) return;
+    const notes = root.querySelector(`.meal-notes[data-slot="${field.dataset.slot}"][data-date="${field.dataset.date}"]`);
+    upsertMeal(field.dataset.date, field.dataset.slot, {
+      title: field.value,
+      notes: notes?.value || "",
+    });
   });
 }

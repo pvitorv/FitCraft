@@ -5,7 +5,19 @@ const STATIC = {
   "/treino": "treino",
   "/playlist": "playlist",
   "/ajustes": "ajustes",
+  "/mais": "mais",
+  "/financeiro": "financeiro",
+  "/nutricao": "nutricao",
 };
+
+function navFor(hash) {
+  if (hash.startsWith("/planos")) return "/planos";
+  if (hash.startsWith("/treino")) return "/treino";
+  if (hash.startsWith("/financeiro")) return "/financeiro";
+  if (hash.startsWith("/nutricao")) return "/nutricao";
+  if (hash.startsWith("/playlist") || hash === "/ajustes" || hash === "/mais") return "/mais";
+  return hash;
+}
 
 export function parseRoute() {
   const hash = window.location.hash.replace("#", "") || "/";
@@ -13,7 +25,7 @@ export function parseRoute() {
     return {
       name: STATIC[hash],
       path: hash,
-      nav: hash.startsWith("/planos") ? "/planos" : hash.startsWith("/treino") ? "/treino" : hash,
+      nav: navFor(hash),
       params: {},
     };
   }
@@ -43,7 +55,7 @@ export function parseRoute() {
     return {
       name: "playlist",
       path: hash,
-      nav: "/playlist",
+      nav: "/mais",
       params: { id: Number(playlistMatch[1]) },
     };
   }
@@ -55,6 +67,26 @@ export function parseRoute() {
       path: hash,
       nav: "/planos",
       params: { id: Number(planMatch[1]) },
+    };
+  }
+
+  const financeMatch = hash.match(/^\/financeiro\/(\d{4}-\d{2})$/);
+  if (financeMatch) {
+    return {
+      name: "financeiro",
+      path: hash,
+      nav: "/financeiro",
+      params: { month: financeMatch[1] },
+    };
+  }
+
+  const nutritionMatch = hash.match(/^\/nutricao\/(semana|mes)\/(\d{4}-\d{2}-\d{2})$/);
+  if (nutritionMatch) {
+    return {
+      name: "nutricao",
+      path: hash,
+      nav: "/nutricao",
+      params: { scope: nutritionMatch[1], day: nutritionMatch[2] },
     };
   }
 

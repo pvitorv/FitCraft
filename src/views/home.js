@@ -1,10 +1,12 @@
-import { nowParts } from "../lib/calendar.js";
+import { nowParts, WEEKDAYS } from "../lib/calendar.js";
+import { barChart, heatMap } from "../lib/charts.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { formatClock } from "../lib/time.js";
 import { cycleForToday, cycleRounds } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
+import { heatmapDays } from "../models/Session.js";
 import { compressImage, getMotto, getProfilePhoto, setMotto, setProfilePhoto } from "../models/Profile.js";
 import { go } from "../routes.js";
 import { anyBorrowableCycle, openBorrowModal } from "./borrowModal.js";
@@ -25,6 +27,7 @@ export async function homeScreen() {
   const photoUrl = photo ? URL.createObjectURL(photo) : "";
   lastPhotoUrl = photoUrl;
   const motto = getMotto();
+  const map = heatmapDays(35);
 
   return {
     html: `
@@ -51,7 +54,7 @@ export async function homeScreen() {
           </article>
 
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 017</div>
+            <div class="kicker"><span class="dot"></span> Versão 018</div>
             <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan
@@ -69,6 +72,19 @@ export async function homeScreen() {
                 ${plan ? "Abrir plano" : "Criar plano"}
               </button>
             </div>
+          </article>
+
+          <h3 class="section-title">Mapa de treino</h3>
+          <article class="card progress-card">
+            <div class="stat-grid is-inside">
+              <div><small>Semana</small><strong>${map.weekCount}</strong></div>
+              <div><small>Mês</small><strong>${map.monthCount}</strong></div>
+              <div><small>Sequência</small><strong>${map.streak}d</strong></div>
+              <div><small>Minutos na semana</small><strong>${map.weekMinutes}</strong></div>
+            </div>
+            ${heatMap(map.items)}
+            ${barChart(map.weekdayCounts, ["#ffd400", "#ffd400", "#ff1a1a", "#ff1a1a", "#1f5cff", "#1f5cff", "#34d399"], WEEKDAYS.map((name) => name.slice(0, 3)))}
+            <p class="muted">Cada quadrado é um dia. O gráfico conta os treinos concluídos desta semana.</p>
           </article>
 
           <h3 class="section-title">Fases do ciclo</h3>

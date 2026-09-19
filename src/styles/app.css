@@ -1461,3 +1461,170 @@ textarea.exercise-name {
     max-height: min(80dvh, 760px);
   }
 }
+
+.bottom-nav.is-six {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.bottom-nav.is-six .nav-btn {
+  min-height: 56px;
+  font-size: 0.58rem;
+  gap: 2px;
+  border-radius: 12px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0 12px;
+}
+
+.stat-grid.is-inside {
+  grid-template-columns: repeat(2, 1fr);
+  margin: 0 0 12px;
+}
+
+.stat-grid .card,
+.stat-grid div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.stat-grid small {
+  color: var(--faint);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat-grid strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.15rem;
+}
+
+.progress-card .muted {
+  margin: 10px 0 0;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
+
+.heat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin: 8px 0;
+}
+
+.heat-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: #1f1f23;
+}
+
+.heat-cell.is-1 { background: #5a4800; }
+.heat-cell.is-2 { background: #ffd400; }
+.heat-cell.is-3 { background: #ff1a1a; }
+
+.stack-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-2);
+  margin: 8px 0 12px;
+}
+
+.stack-slice {
+  display: block;
+  height: 100%;
+}
+
+.stack-slice.is-empty {
+  width: 100%;
+  background: var(--surface-2);
+}
+
+.month-chip {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.day-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0 16px;
+  overflow-x: auto;
+}
+
+.day-chip {
+  min-width: 0;
+  padding: 8px 4px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  text-align: center;
+}
+
+.day-chip small,
+.day-chip em {
+  display: block;
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-style: normal;
+}
+
+.day-chip.is-selected {
+  border-color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.day-chip.is-today strong {
+  color: var(--yellow);
+}
+
+.meal-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.meal-card small {
+  color: var(--yellow);
+}
+
+.expense-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.expense-side {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+@media (min-width: 900px) {
+  .bottom-nav.is-six {
+    grid-template-columns: 1fr;
+  }
+
+  .day-strip {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+

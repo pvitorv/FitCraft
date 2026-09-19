@@ -1,9 +1,10 @@
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
-import { formatClock } from "../lib/time.js";
 import { cycleForToday, findCycle } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { findPlan, getActivePlan } from "../models/Plan.js";
+import { logCompletedSession } from "../models/Session.js";
+import { cycleDuration, formatClock } from "../lib/time.js";
 import { playCues, resetCues, unlockCues } from "../services/cues.js";
 import { cycleSignature, timerEngine } from "../services/timerEngine.js";
 import { keepAwake, releaseAwake } from "../services/wakeLock.js";
@@ -156,7 +157,20 @@ export async function treinoScreen(params) {
       unsubscribeMusic?.();
       if (!cycle) return;
 
-      unsubscribe = timerEngine.subscribe((snapshot) => paint(root, snapshot, exercises));
+      let wasEnded = timerEngine.snapshot().ended;
+      unsubscribe = timerEngine.subscribe((snapshot) => {
+        paint(root, snapshot, exercises);
+        if (snapshot.ended && snapshot.total && !wasEnded) {
+          wasEnded = true;
+          logCompletedSession({
+            cycle,
+            plan: cyclePlan,
+            durationSeconds: cycleDuration(cycle, exercises),
+            exerciseCount: exercises.length,
+          });
+        }
+        if (!snapshot.ended) wasEnded = false;
+      });
       unsubscribeMusic = subscribeMusic(() => {
         const button = root.querySelector("[data-music]");
         if (button) button.textContent = musicButtonLabel();

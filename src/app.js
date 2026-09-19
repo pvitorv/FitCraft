@@ -12,6 +12,9 @@ import { releaseAwake } from "./services/wakeLock.js";
 import { treinoScreen } from "./views/treino.js";
 import { playlistScreen } from "./views/playlist.js";
 import { ajustesScreen } from "./views/ajustes.js";
+import { financeiroScreen } from "./views/financeiro.js";
+import { nutricaoScreen } from "./views/nutricao.js";
+import { maisScreen } from "./views/mais.js";
 
 const screens = {
   home: homeScreen,
@@ -22,6 +25,9 @@ const screens = {
   treino: treinoScreen,
   playlist: playlistScreen,
   ajustes: ajustesScreen,
+  financeiro: financeiroScreen,
+  nutricao: nutricaoScreen,
+  mais: maisScreen,
 };
 
 let lastPath = "";
