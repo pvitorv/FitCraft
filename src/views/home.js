@@ -5,7 +5,7 @@ export function homeView() {
     <section class="layout-split">
       <div>
         <article class="hero">
-          <div class="kicker"><span class="dot"></span> Versão 001</div>
+          <div class="kicker"><span class="dot"></span> Versão 002</div>
           <h2>Seu cronômetro de treino metabólico.</h2>
           <p>Esta versão só prova o visual e a navegação. Planos, timer real, SQLite e playlist entram nas próximas entregas numeradas.</p>
           <div class="cta-row">
@@ -37,7 +37,7 @@ export function homeView() {
       <aside class="empty">
         <div class="empty-icon">${icons.dumbbell}</div>
         <h3>Nenhum plano ainda</h3>
-        <p>Na 002 você cria ciclos de 7, 15 ou 30 dias e dá nomes como Segunda, Terça…</p>
+        <p>Na 003 você cria ciclos de 7, 15 ou 30 dias e dá nomes como Segunda, Terça…</p>
       </aside>
     </section>
   `;

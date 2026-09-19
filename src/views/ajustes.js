@@ -9,7 +9,7 @@ export function ajustesView() {
       <div class="row">
         <div>
           <strong>Manter tela ligada</strong>
-          <p class="muted">Durante o treino. Ativo a partir da 004.</p>
+          <p class="muted">Durante o treino. Ativo a partir da 005.</p>
         </div>
         <div class="switch" aria-hidden="true"></div>
       </div>
@@ -23,9 +23,9 @@ export function ajustesView() {
       <div class="row">
         <div>
           <strong>Versão instalada</strong>
-          <p class="muted">FitCraft 001 — esqueleto visual</p>
+          <p class="muted">FitCraft 002 — cores das fases</p>
         </div>
-        <strong>001</strong>
+        <strong>002</strong>
       </div>
     </div>
   `;

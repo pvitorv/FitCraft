@@ -8,7 +8,7 @@ export function treinoView() {
         </div>
       </div>
       <div class="exercise-name">Burpee</div>
-      <p class="muted">Prévia visual. O temporizador de verdade entra na 004.</p>
+      <p class="muted">Prévia visual. O temporizador de verdade entra na 005.</p>
       <div class="controls">
         <button class="btn btn-ghost" disabled>Pular</button>
         <button class="btn btn-primary" disabled>Pausar timer</button>

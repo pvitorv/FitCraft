@@ -9,7 +9,7 @@ export function playlistView() {
     </article>
     <div class="empty">
       <div class="empty-icon">${icons.music}</div>
-      <h3>Player chega na 005</h3>
+      <h3>Player chega na 006</h3>
       <p>Você vai importar arquivos que já possui. O FitCraft não baixa música de YouTube nem Spotify.</p>
     </div>
   `;
