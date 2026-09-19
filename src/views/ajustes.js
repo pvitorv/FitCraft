@@ -35,7 +35,7 @@ export async function ajustesScreen() {
         <button class="row" type="button" id="import-cycle">
           <div>
             <strong>Receber um ciclo</strong>
-            <p class="muted">Abre um arquivo .fitcraft — ou toque o arquivo no WhatsApp para o FitCraft receber sozinho.</p>
+            <p class="muted">Abre o arquivo FitCraft. Quem recebe no WhatsApp: toque o arquivo e escolha FitCraft. Se não aparecer, use este botão.</p>
           </div>
           ${icons.share}
         </button>
@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 023 — .fitcraft direto no WhatsApp</p>
+            <p class="muted">FitCraft 024 — arquivo que o WhatsApp realmente anexa</p>
           </div>
-          <strong>023</strong>
+          <strong>024</strong>
         </div>
       </div>
     `,

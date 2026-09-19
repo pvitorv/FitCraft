@@ -223,7 +223,7 @@ export async function planoScreen({ id }) {
           try {
             const result = await shareOrSaveCycle(Number(button.dataset.shareCycle));
             if (result === "downloaded") {
-              alert("Arquivo .fitcraft salvo. Envie por WhatsApp, e-mail ou Drive.");
+              alert("Arquivo salvo no PC. No celular o Enviar abre o WhatsApp com o arquivo.");
             }
           } catch (error) {
             if (isAbortError(error)) return;

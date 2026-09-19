@@ -319,7 +319,7 @@ export async function cicloScreen({ id, cycleId }) {
         try {
           const result = await shareOrSaveCycle(cycle.id);
           if (result === "downloaded") {
-            alert("Arquivo .fitcraft salvo. Envie por WhatsApp, e-mail ou Drive.");
+            alert("Arquivo salvo no PC. No celular o Enviar abre o WhatsApp com o arquivo.");
           }
         } catch (error) {
           if (isAbortError(error)) return;

@@ -20,7 +20,7 @@ export async function maisScreen() {
         <button class="row" data-go="/planos">
           <div>
             <strong>Planos de treino</strong>
-            <p class="muted">7, 14 ou 28 ciclos. Envie o .fitcraft pelo WhatsApp.</p>
+            <p class="muted">7, 14 ou 28 ciclos. Enviar manda o arquivo no WhatsApp.</p>
           </div>
           ${icons.plans}
         </button>

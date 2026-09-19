@@ -9,7 +9,7 @@ import {
 
 export const CYCLE_PACK_KIND = "fitcraft.cycle";
 export const CYCLE_PACK_FORMAT = 1;
-export const CYCLE_FILE_EXT = ".fitcraft";
+export const CYCLE_FILE_EXT = ".fitcraft.json";
 const MAX_BYTES = 200_000;
 const MAX_EXERCISES = 40;
 const MAX_NAME = 120;
@@ -165,7 +165,7 @@ export function pickCycleFile() {
   return new Promise((resolve, reject) => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = `${CYCLE_FILE_EXT},application/json,text/plain`;
+    input.accept = ".fitcraft,.fitcraft.json,.json,application/json,text/plain";
     input.addEventListener(
       "change",
       () => {

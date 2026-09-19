@@ -93,11 +93,9 @@ if (!manifest.includes("fitcraft-file")) {
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" />
                 <data android:scheme="file" />
-                <data android:mimeType="*/*" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\\\\.fitcraft" />
-                <data android:pathPattern=".*\\\\..*\\\\.fitcraft" />
-                <data android:pathPattern=".*\\\\..*\\\\..*\\\\.fitcraft" />
+                <data android:mimeType="application/json" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -116,4 +114,21 @@ if (!manifest.includes('android:launchMode="singleTask"')) {
 
 writeFileSync(manifestPath, manifest);
 
+patchSharePluginMime();
+
 console.log(`APK ${version} assinado como ${vendor}`);
+
+function patchSharePluginMime() {
+  const sharePlugin = join(
+    root,
+    "node_modules/@capacitor/share/android/src/main/java/com/capacitorjs/plugins/share/SharePlugin.java",
+  );
+  try {
+    let java = readFileSync(sharePlugin, "utf8");
+    if (!java.includes('type = "*/*"')) return;
+    java = java.replace('type = "*/*";', 'type = "application/octet-stream";');
+    writeFileSync(sharePlugin, java);
+  } catch {
+    // Plugin ainda não instalado neste ambiente
+  }
+}

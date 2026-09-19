@@ -54,7 +54,7 @@ export async function homeScreen() {
           </article>
 
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 023</div>
+            <div class="kicker"><span class="dot"></span> Versão 024</div>
             <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan

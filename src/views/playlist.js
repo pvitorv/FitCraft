@@ -93,7 +93,7 @@ async function playlistHome() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Playlist local</div>
         <h2>Summer Eletrohits no aparelho.</h2>
-        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém. Enviar abre o WhatsApp, Telegram, e-mail ou Drive com o arquivo .fitcraft (só os nomes das faixas, nunca o áudio).</p>
+        <p>Três playlists prontas. Você importa os arquivos que já tem — sem YouTube, sem Spotify, sem baixar de ninguém. Enviar manda o arquivo da lista (só os nomes das faixas, nunca o áudio) pelo WhatsApp, Telegram, e-mail ou Drive.</p>
         <div class="cta-row">
           <button class="btn btn-ghost" type="button" id="import-playlist">${icons.share} Receber playlist</button>
         </div>
@@ -254,7 +254,7 @@ async function playlistDetail(id) {
         try {
           const result = await shareOrSavePlaylist(playlist.id);
           if (result === "downloaded") {
-            alert("Arquivo .fitcraft salvo. Ele leva só os nomes das faixas, não o áudio.");
+            alert("Arquivo salvo no PC. No celular o Enviar abre o WhatsApp com a lista de nomes, sem o áudio.");
           }
         } catch (error) {
           if (isAbortError(error)) return;
