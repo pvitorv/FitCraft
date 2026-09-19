@@ -1,0 +1,8 @@
+{
+  "appId": "com.fitcraft.app",
+  "appName": "FitCraft",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}
