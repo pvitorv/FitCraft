@@ -22,7 +22,7 @@ export function renderShell(innerHtml) {
             <p>Timer metabólico offline</p>
           </div>
         </div>
-        <span class="version-chip">012</span>
+        <span class="version-chip">013</span>
       </header>
       <main class="screen">${innerHtml}</main>
       <nav class="bottom-nav">

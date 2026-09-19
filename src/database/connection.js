@@ -5,6 +5,7 @@ import { migrate } from "./migrate.js";
 const IDB_NAME = "fitcraft";
 const STORE = "kv";
 const DB_KEY = "sqlite";
+const AUDIO_PREFIX = "audio:";
 
 let database = null;
 let persistTimer = null;
@@ -15,7 +16,7 @@ function openIdb() {
   if (idbPromise) return idbPromise;
 
   idbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(IDB_NAME, 1);
+    const request = indexedDB.open(IDB_NAME, 2);
     request.onupgradeneeded = () => {
       if (!request.result.objectStoreNames.contains(STORE)) {
         request.result.createObjectStore(STORE);
@@ -126,4 +127,34 @@ export function get(sql, params = []) {
 
 export function lastId() {
   return get("SELECT last_insert_rowid() AS id").id;
+}
+
+export async function putAudio(key, blob) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(blob, AUDIO_PREFIX + key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+export async function getAudio(key) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readonly");
+    const request = tx.objectStore(STORE).get(AUDIO_PREFIX + key);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function deleteAudio(key) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(AUDIO_PREFIX + key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
 }

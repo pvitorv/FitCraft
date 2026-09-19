@@ -845,6 +845,101 @@ button.row {
   font-size: 0.88rem;
 }
 
+.player-bar,
+.playlist-card {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.playlist-card {
+  margin-top: 0;
+}
+
+.playlist-card.is-active {
+  border-color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.playlist-open {
+  width: 100%;
+  text-align: left;
+}
+
+.playlist-open strong,
+.track-play strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.player-actions {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  gap: 8px;
+  align-items: center;
+}
+
+.player-icon {
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.music-switch {
+  width: 100%;
+}
+
+.track-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.track-card {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+
+.track-card.is-current {
+  border-color: var(--yellow);
+  background: var(--yellow-dim);
+}
+
+.track-play {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  align-items: center;
+}
+
+.track-play em {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: normal;
+}
+
+.track-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .save-bar .btn {
   width: 100%;
 }
@@ -1181,6 +1276,17 @@ textarea.exercise-name {
 
   .save-bar .btn {
     width: auto;
+  }
+
+  .player-bar,
+  .playlist-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .track-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
   }
 
   .controls {

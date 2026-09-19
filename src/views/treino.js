@@ -7,10 +7,12 @@ import { findPlan, getActivePlan } from "../models/Plan.js";
 import { playCues, resetCues, unlockCues } from "../services/cues.js";
 import { cycleSignature, timerEngine } from "../services/timerEngine.js";
 import { keepAwake, releaseAwake } from "../services/wakeLock.js";
+import { musicButtonLabel, snapshot as musicSnapshot, subscribe as subscribeMusic, toggleMusic } from "../services/musicPlayer.js";
 import { go } from "../routes.js";
 import { anyBorrowableCycle, openBorrowModal } from "./borrowModal.js";
 
 let unsubscribe = null;
+let unsubscribeMusic = null;
 
 function ringStyle(snapshot) {
   const color =
@@ -119,11 +121,11 @@ export async function treinoScreen(params) {
               </div>
             </div>
             <div class="exercise-name" data-title>${escapeHtml(exercises[0]?.name ?? "Sem exercícios")}</div>
-            <p class="muted" data-hint>O timer e a música terão pauses separados. Música entra na 006.</p>
+            <p class="muted" data-hint>O timer e a música pausam em botões diferentes.</p>
             <div class="controls">
               <button class="btn btn-ghost" type="button" data-skip>Pular</button>
               <button class="btn btn-primary" type="button" data-main ${exercises.length ? "" : "disabled"}>Iniciar</button>
-              <button class="btn btn-ghost" type="button" disabled>Música</button>
+              <button class="btn btn-ghost" type="button" data-music>${musicButtonLabel()}</button>
             </div>
           </section>
           <ol class="queue">
@@ -151,9 +153,14 @@ export async function treinoScreen(params) {
       `,
     bind(root) {
       unsubscribe?.();
+      unsubscribeMusic?.();
       if (!cycle) return;
 
       unsubscribe = timerEngine.subscribe((snapshot) => paint(root, snapshot, exercises));
+      unsubscribeMusic = subscribeMusic(() => {
+        const button = root.querySelector("[data-music]");
+        if (button) button.textContent = musicButtonLabel();
+      });
 
       root.querySelector("#borrow-open")?.addEventListener("click", () => {
         openBorrowModal({
@@ -187,6 +194,14 @@ export async function treinoScreen(params) {
         unlockCues();
         timerEngine.skip();
         if (!timerEngine.snapshot().running) releaseAwake();
+      });
+
+      root.querySelector("[data-music]")?.addEventListener("click", () => {
+        if (!musicSnapshot().hasTracks) {
+          go("/playlist");
+          return;
+        }
+        toggleMusic();
       });
     },
   };

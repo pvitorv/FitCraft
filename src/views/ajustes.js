@@ -13,7 +13,7 @@ export async function ajustesScreen() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Ajustes</div>
         <h2>Tudo no aparelho.</h2>
-        <p>Som, vibração e tela ligada valem só para o timer. A playlist terá pause próprio na 006.</p>
+        <p>Som, vibração e tela ligada valem só para o timer. A playlist liga e pausa sozinha.</p>
       </article>
       <div class="list" style="margin-top:16px">
         <button class="row" type="button" data-toggle="keep_screen_on">
@@ -40,9 +40,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 012 — botão salvar ciclo</p>
+            <p class="muted">FitCraft 013 — playlists Summer Eletrohits</p>
           </div>
-          <strong>012</strong>
+          <strong>013</strong>
         </div>
       </div>
     `,

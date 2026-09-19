@@ -38,6 +38,16 @@ export function parseRoute() {
     };
   }
 
+  const playlistMatch = hash.match(/^\/playlist\/(\d+)$/);
+  if (playlistMatch) {
+    return {
+      name: "playlist",
+      path: hash,
+      nav: "/playlist",
+      params: { id: Number(playlistMatch[1]) },
+    };
+  }
+
   const planMatch = hash.match(/^\/planos\/(\d+)$/);
   if (planMatch) {
     return {

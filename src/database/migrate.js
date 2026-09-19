@@ -41,9 +41,36 @@ export function migrate(database) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_exercises_cycle ON exercises(cycle_id, sort_order);
+
+    CREATE TABLE IF NOT EXISTS playlists (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS tracks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      playlist_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      mime TEXT NOT NULL DEFAULT 'audio/mpeg',
+      duration_seconds INTEGER NOT NULL DEFAULT 0,
+      file_key TEXT NOT NULL,
+      sort_order INTEGER NOT NULL,
+      FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_tracks_playlist ON tracks(playlist_id, sort_order);
   `);
 
   if (!columnNames(database, "cycles").includes("rounds")) {
     database.run("ALTER TABLE cycles ADD COLUMN rounds INTEGER NOT NULL DEFAULT 1");
   }
+
+  [
+    ["summer-1", "Summer Eletrohits 1"],
+    ["summer-2", "Summer Eletrohits 2"],
+    ["summer-3", "Summer Eletrohits 3"],
+  ].forEach(([slug, name]) => {
+    database.run("INSERT OR IGNORE INTO playlists (slug, name) VALUES (?, ?)", [slug, name]);
+  });
 }
