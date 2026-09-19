@@ -1,12 +1,12 @@
-const WEEKDAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 const WEEKDAYS_LONG = [
+  "domingo",
   "segunda-feira",
   "terça-feira",
   "quarta-feira",
   "quinta-feira",
   "sexta-feira",
   "sábado",
-  "domingo",
 ];
 const MONTHS = [
   "janeiro",
@@ -24,12 +24,11 @@ const MONTHS = [
 ];
 
 export function weekdayIndex(date = new Date()) {
-  return (date.getDay() + 6) % 7;
+  return date.getDay();
 }
 
 export function cycleDayIndex(daysCount, date = new Date()) {
-  if (daysCount === 7) return weekdayIndex(date);
-  return (date.getDate() - 1) % daysCount;
+  return weekdayIndex(date) % daysCount;
 }
 
 export function greeting(date = new Date()) {

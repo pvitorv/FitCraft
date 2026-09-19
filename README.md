@@ -2,17 +2,17 @@
 
 App Android **offline** de ciclos metabólicos (preparação, treino e intervalo). Sem loja, sem servidor. Você instala o APK no celular.
 
-Versão atual do código: **020** (azul vivo e escuro, card da foto azul).
+Versão atual do código: **021** (semana de domingo a sábado).
 
 ## Como testar no celular (sem emulador)
 
 1. Abra **https://github.com/pvitorv/FitCraft**.
 2. Clique na aba **Actions** (ao lado de Code, Issues, Pull requests).
 3. Na esquerda, clique em **Build APK**.
-4. Abra a execução mais recente da branch **020**.
+4. Abra a execução mais recente da branch **021**.
 5. Espere o ✓ verde (pode levar até 15 minutos). Se estiver X vermelho, avise.
-6. No final da página, em **Artifacts**, baixe `fitcraft-020`.
-7. O GitHub manda um **zip**. Abra, pegue o `fitcraft-020.apk`.
+6. No final da página, em **Artifacts**, baixe `fitcraft-021`.
+7. O GitHub manda um **zip**. Abra, pegue o `fitcraft-021.apk`.
 8. Mande o APK para o celular (WhatsApp, Telegram, Drive ou cabo).
 9. No celular: abra o arquivo → **Instalar**. Se pedir, permita **fontes desconhecidas** só para este app.
 
@@ -53,6 +53,7 @@ Sempre sequenciais: `001`, `002`, `003`…
 - `018` — mapa de treino, nutrição, gastos e envio de playlist
 - `019` — fundo azul, cards amarelos
 - `020` — azul vivo e escuro; card da foto azul
+- `021` — planejador de domingo a sábado
 
 O `main` só avança quando aquela versão rodou no seu aparelho.
 

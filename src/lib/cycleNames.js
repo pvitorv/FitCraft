@@ -1,22 +1,14 @@
-const WEEKDAYS = [
-  "Segunda",
-  "Terça",
-  "Quarta",
-  "Quinta",
-  "Sexta",
-  "Sábado",
-  "Domingo",
-];
+import { WEEKDAYS } from "./calendar.js";
 
 export function defaultCycleNames(daysCount) {
   if (daysCount === 7) {
     return [...WEEKDAYS];
   }
 
-  return Array.from(
-    { length: daysCount },
-    (_, index) => `Dia ${String(index + 1).padStart(2, "0")}`,
-  );
+  return Array.from({ length: daysCount }, (_, index) => {
+    const weekday = WEEKDAYS[index % 7];
+    return `${weekday} · ${String(index + 1).padStart(2, "0")}`;
+  });
 }
 
 export function daysLabel(daysCount) {

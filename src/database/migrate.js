@@ -109,4 +109,27 @@ export function migrate(database) {
   ].forEach(([slug, name]) => {
     database.run("INSERT OR IGNORE INTO playlists (slug, name) VALUES (?, ?)", [slug, name]);
   });
+
+  rotateSevenDayPlansToSundayFirst(database);
+}
+
+function settingValue(database, key) {
+  const rows = database.exec("SELECT value FROM settings WHERE key = '" + key.replace(/'/g, "''") + "'");
+  return rows[0]?.values?.[0]?.[0] ?? null;
+}
+
+function rotateSevenDayPlansToSundayFirst(database) {
+  if (settingValue(database, "week_sunday_first") === "1") return;
+
+  database.run(`
+    UPDATE cycles
+    SET day_index = day_index + 100
+    WHERE plan_id IN (SELECT id FROM plans WHERE days_count = 7)
+  `);
+  database.run(`
+    UPDATE cycles
+    SET day_index = (day_index - 100 + 1) % 7
+    WHERE day_index >= 100
+  `);
+  database.run("INSERT OR REPLACE INTO settings (key, value) VALUES ('week_sunday_first', '1')");
 }

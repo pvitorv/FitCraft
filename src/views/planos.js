@@ -3,7 +3,7 @@ import { isAbortError } from "../lib/cyclePack.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { activatePlan, createPlan, deletePlan, findPlan, listPlans, renamePlan } from "../models/Plan.js";
-import { cycleDayIndex } from "../lib/calendar.js";
+import { WEEKDAYS, cycleDayIndex } from "../lib/calendar.js";
 import { cycleRounds, listCycles } from "../models/Cycle.js";
 import { go } from "../routes.js";
 import { shareOrSaveCycle } from "../services/shareCycle.js";
@@ -43,7 +43,7 @@ export async function planosScreen() {
           : `<div class="empty">
               <div class="empty-icon">${icons.plans}</div>
               <h3>Nenhum plano</h3>
-              <p>Comece por um plano de 7 dias. Os ciclos já nascem como Segunda, Terça, Quarta…</p>
+              <p>Comece por um plano de 7 dias. Os ciclos já nascem como Domingo, Segunda, Terça… até Sábado.</p>
             </div>`
       }
     `,
@@ -170,7 +170,7 @@ export async function planoScreen({ id }) {
                   <span class="cycle-index">${String(cycle.day_index + 1).padStart(2, "0")}</span>
                   <div class="cycle-copy">
                     <strong>${escapeHtml(cycle.name)}${cycle.day_index === todayIndex ? " · hoje" : ""}</strong>
-                    <p class="muted">${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
+                    <p class="muted">${plan.days_count === 7 ? "" : `${WEEKDAYS[cycle.day_index % 7]} · `}${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
                   </div>
                   <div class="cycle-actions">
                     <button class="btn btn-ghost" type="button" data-go="/planos/${plan.id}/ciclos/${cycle.id}">

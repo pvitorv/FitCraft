@@ -1,6 +1,6 @@
 import { all, get, run } from "../database/connection.js";
 import { cycleRounds } from "./Cycle.js";
-import { isoDate, startOfWeek } from "../lib/calendar.js";
+import { isoDate, startOfWeek, weekdayIndex } from "../lib/calendar.js";
 
 export function logCompletedSession({ cycle, plan, durationSeconds, exerciseCount }) {
   if (!cycle) return null;
@@ -101,7 +101,7 @@ function weekdayCounts(rows) {
   const counts = [0, 0, 0, 0, 0, 0, 0];
   rows.forEach((row) => {
     const date = new Date(row.completed_at);
-    counts[(date.getDay() + 6) % 7] += 1;
+    counts[weekdayIndex(date)] += 1;
   });
   return counts;
 }
@@ -117,7 +117,7 @@ export function heatmapDays(days = 35, date = new Date()) {
     items.push({
       date: key,
       count: stats.byDay.get(key) || 0,
-      weekday: (cursor.getDay() + 6) % 7,
+      weekday: weekdayIndex(cursor),
     });
   }
   return { ...stats, items };

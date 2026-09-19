@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 020 — azul vivo, card da foto azul</p>
+            <p class="muted">FitCraft 021 — semana de domingo a sábado</p>
           </div>
-          <strong>020</strong>
+          <strong>021</strong>
         </div>
       </div>
     `,
