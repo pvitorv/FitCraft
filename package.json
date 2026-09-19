@@ -12,7 +12,8 @@
     "@capacitor/android": "^7.4.3",
     "@capacitor/core": "^7.4.3",
     "@fontsource/dm-sans": "^5.2.8",
-    "@fontsource/outfit": "^5.2.8"
+    "@fontsource/outfit": "^5.2.8",
+    "sql.js": "^1.14.2"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",

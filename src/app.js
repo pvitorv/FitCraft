@@ -1,26 +1,46 @@
 import "./styles/app.css";
-import { currentPath } from "./routes.js";
+import { bootDb } from "./database/connection.js";
+import { escapeHtml } from "./lib/html.js";
+import { parseRoute } from "./routes.js";
 import { bindNavigation, renderShell } from "./views/layout.js";
-import { homeView } from "./views/home.js";
-import { planosView } from "./views/planos.js";
-import { treinoView } from "./views/treino.js";
-import { playlistView } from "./views/playlist.js";
-import { ajustesView } from "./views/ajustes.js";
+import { homeScreen } from "./views/home.js";
+import { planoNovoScreen, planoScreen, planosScreen } from "./views/planos.js";
+import { treinoScreen } from "./views/treino.js";
+import { playlistScreen } from "./views/playlist.js";
+import { ajustesScreen } from "./views/ajustes.js";
 
-const views = {
-  "/": homeView,
-  "/planos": planosView,
-  "/treino": treinoView,
-  "/playlist": playlistView,
-  "/ajustes": ajustesView,
+const screens = {
+  home: homeScreen,
+  planos: planosScreen,
+  planoNovo: planoNovoScreen,
+  plano: planoScreen,
+  treino: treinoScreen,
+  playlist: playlistScreen,
+  ajustes: ajustesScreen,
 };
 
-function render() {
+async function render() {
   const root = document.querySelector("#app");
-  const path = currentPath();
-  root.innerHTML = renderShell(views[path]());
+  const route = parseRoute();
+  const screen = screens[route.name] ?? homeScreen;
+  const { html, bind } = await screen(route.params);
+  root.innerHTML = renderShell(html);
   bindNavigation(root);
+  bind?.(root);
 }
 
-window.addEventListener("hashchange", render);
-render();
+bootDb()
+  .then(() => {
+    window.addEventListener("hashchange", render);
+    return render();
+  })
+  .catch((error) => {
+    document.querySelector("#app").innerHTML = `
+      <main class="screen">
+        <div class="empty">
+          <h3>Não foi possível abrir o banco</h3>
+          <p>${escapeHtml(error.message)}</p>
+        </div>
+      </main>
+    `;
+  });

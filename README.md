@@ -2,7 +2,7 @@
 
 App Android **offline** de ciclos metabólicos (preparação, treino e intervalo). Sem loja, sem servidor. Você instala o APK no celular.
 
-Versão atual do código: **002** (cores das fases).
+Versão atual do código: **003** (planos e ciclos no SQLite).
 
 ## Como testar no celular (sem emulador)
 
@@ -10,7 +10,7 @@ Versão atual do código: **002** (cores das fases).
 2. Clique na aba **Actions**.
 3. Abra a execução mais recente de **Build APK**.
 4. Espere o ✓ verde (a primeira vez pode levar até 15 minutos).
-5. No final da página, em **Artifacts**, baixe `fitcraft-002`.
+5. No final da página, em **Artifacts**, baixe `fitcraft-003`.
 6. Abra o zip, pegue o `.apk`, mande para o celular (Telegram, Drive ou cabo).
 7. Instale permitindo fontes desconhecidas só para este arquivo.
 
