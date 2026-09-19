@@ -6,6 +6,7 @@ const STATIC = {
   "/playlist": "playlist",
   "/ajustes": "ajustes",
   "/mais": "mais",
+  "/medidas": "medidas",
   "/financeiro": "financeiro",
   "/nutricao": "nutricao",
 };
@@ -15,7 +16,7 @@ function navFor(hash) {
   if (hash.startsWith("/treino")) return "/treino";
   if (hash.startsWith("/financeiro")) return "/financeiro";
   if (hash.startsWith("/nutricao")) return "/nutricao";
-  if (hash.startsWith("/playlist") || hash === "/ajustes" || hash === "/mais") return "/mais";
+  if (hash.startsWith("/playlist") || hash === "/ajustes" || hash === "/mais" || hash === "/medidas") return "/mais";
   return hash;
 }
 

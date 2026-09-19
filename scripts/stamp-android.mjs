@@ -73,6 +73,11 @@ if (!manifest.includes("android:description")) {
   );
 }
 
+manifest = manifest.replace(/android:allowBackup="false"/g, 'android:allowBackup="true"');
+if (!manifest.includes("android:allowBackup")) {
+  manifest = manifest.replace("<application", '<application\n        android:allowBackup="true"');
+}
+
 const javaDir = join(appDir, "src", "main", "java", "com", "fitcraft", "app");
 mkdirSync(javaDir, { recursive: true });
 copyFileSync(join(root, "scripts", "android", "MainActivity.java"), join(javaDir, "MainActivity.java"));

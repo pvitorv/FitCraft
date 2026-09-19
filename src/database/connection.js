@@ -1,5 +1,16 @@
 import initSqlJs from "sql.js";
 import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
+import {
+  deleteDurableAudio,
+  durableAudioExists,
+  durableBlobExists,
+  readDurableAudio,
+  readDurableBlob,
+  readDurableSqlite,
+  writeDurableAudio,
+  writeDurableBlob,
+  writeDurableSqlite,
+} from "./durable.js";
 import { migrate } from "./migrate.js";
 
 const IDB_NAME = "fitcraft";
@@ -58,6 +69,100 @@ async function writeBytes(bytes) {
   });
 }
 
+async function idbGet(key) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readonly");
+    const request = tx.objectStore(STORE).get(key);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function idbPut(key, value) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function idbDelete(key) {
+  const idb = await openIdb();
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function openSqlite(SQL, bytes) {
+  try {
+    const instance = bytes ? new SQL.Database(new Uint8Array(bytes)) : new SQL.Database();
+    instance.run("PRAGMA foreign_keys = ON;");
+    return instance;
+  } catch (error) {
+    console.error("Dump SQLite inválido", error);
+    return null;
+  }
+}
+
+function userDataScore(instance) {
+  if (!instance) return 0;
+  const queries = [
+    "SELECT COUNT(*) FROM plans",
+    "SELECT COUNT(*) FROM cycles",
+    "SELECT COUNT(*) FROM tracks",
+    "SELECT COUNT(*) FROM sessions",
+    "SELECT COUNT(*) FROM expenses",
+    "SELECT COUNT(*) FROM meals",
+    "SELECT COUNT(*) FROM body_logs",
+  ];
+  let score = 0;
+  for (const sql of queries) {
+    try {
+      const result = instance.exec(sql);
+      score += Number(result[0]?.values?.[0]?.[0] || 0);
+    } catch {
+      // dump antigo ainda não tem a tabela
+    }
+  }
+  return score;
+}
+
+async function syncMedia() {
+  try {
+    const tracks = all("SELECT file_key, mime FROM tracks");
+    for (const track of tracks) {
+      if (!track.file_key) continue;
+      const idbBlob = await idbGet(AUDIO_PREFIX + track.file_key);
+      if (idbBlob) {
+        if (!(await durableAudioExists(track.file_key))) {
+          await writeDurableAudio(track.file_key, idbBlob);
+        }
+        continue;
+      }
+      const diskBlob = await readDurableAudio(track.file_key, track.mime);
+      if (diskBlob) await idbPut(AUDIO_PREFIX + track.file_key, diskBlob);
+    }
+
+    const idbPhoto = await idbGet(`${BLOB_PREFIX}profile-photo`);
+    if (idbPhoto) {
+      if (!(await durableBlobExists("profile-photo"))) {
+        await writeDurableBlob("profile-photo", idbPhoto);
+      }
+      return;
+    }
+    const diskPhoto = await readDurableBlob("profile-photo");
+    if (diskPhoto) await idbPut(`${BLOB_PREFIX}profile-photo`, diskPhoto);
+  } catch (error) {
+    console.error("Falha ao sincronizar áudio e foto no aparelho", error);
+  }
+}
+
 export async function bootDb() {
   if (database) {
     migrate(database);
@@ -66,11 +171,24 @@ export async function bootDb() {
   }
 
   const SQL = await initSqlJs({ locateFile: () => wasmUrl });
-  const saved = await readBytes();
-  database = saved ? new SQL.Database(new Uint8Array(saved)) : new SQL.Database();
-  database.run("PRAGMA foreign_keys = ON;");
+  const idbBytes = await readBytes();
+  const diskBytes = await readDurableSqlite();
+  const idbDb = openSqlite(SQL, idbBytes);
+  const diskDb = diskBytes ? openSqlite(SQL, diskBytes) : null;
+  const idbScore = userDataScore(idbDb);
+  const diskScore = userDataScore(diskDb);
+
+  if (diskDb && diskScore > idbScore) {
+    idbDb?.close();
+    database = diskDb;
+  } else {
+    diskDb?.close();
+    database = idbDb || openSqlite(SQL, null);
+  }
+
   migrate(database);
   await persistNow();
+  await syncMedia();
   return database;
 }
 
@@ -86,7 +204,13 @@ export function persist() {
     .catch(() => {})
     .then(async () => {
       if (!database) return;
-      await writeBytes(database.export());
+      const bytes = database.export();
+      await writeBytes(bytes);
+      try {
+        await writeDurableSqlite(bytes);
+      } catch (error) {
+        console.error("Falha ao copiar o banco no aparelho", error);
+      }
     });
   return persistChain;
 }
@@ -131,51 +255,40 @@ export function lastId() {
 }
 
 export async function putAudio(key, blob) {
-  const idb = await openIdb();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(blob, AUDIO_PREFIX + key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  await idbPut(AUDIO_PREFIX + key, blob);
+  try {
+    await writeDurableAudio(key, blob);
+  } catch (error) {
+    console.error("Falha ao copiar o áudio no aparelho", error);
+  }
 }
 
 export async function getAudio(key) {
-  const idb = await openIdb();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction(STORE, "readonly");
-    const request = tx.objectStore(STORE).get(AUDIO_PREFIX + key);
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject(request.error);
-  });
+  const fromIdb = await idbGet(AUDIO_PREFIX + key);
+  if (fromIdb) return fromIdb;
+  const fromDisk = await readDurableAudio(key);
+  if (fromDisk) await idbPut(AUDIO_PREFIX + key, fromDisk);
+  return fromDisk;
 }
 
 export async function putBlob(key, blob) {
-  const idb = await openIdb();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put(blob, BLOB_PREFIX + key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  await idbPut(BLOB_PREFIX + key, blob);
+  try {
+    await writeDurableBlob(key, blob);
+  } catch (error) {
+    console.error("Falha ao copiar o arquivo no aparelho", error);
+  }
 }
 
 export async function getBlob(key) {
-  const idb = await openIdb();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction(STORE, "readonly");
-    const request = tx.objectStore(STORE).get(BLOB_PREFIX + key);
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject(request.error);
-  });
+  const fromIdb = await idbGet(BLOB_PREFIX + key);
+  if (fromIdb) return fromIdb;
+  const fromDisk = await readDurableBlob(key);
+  if (fromDisk) await idbPut(BLOB_PREFIX + key, fromDisk);
+  return fromDisk;
 }
 
 export async function deleteAudio(key) {
-  const idb = await openIdb();
-  return new Promise((resolve, reject) => {
-    const tx = idb.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).delete(AUDIO_PREFIX + key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+  await idbDelete(AUDIO_PREFIX + key);
+  await deleteDurableAudio(key);
 }

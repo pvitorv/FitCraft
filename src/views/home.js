@@ -8,6 +8,7 @@ import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
 import { heatmapDays } from "../models/Session.js";
 import { compressImage, getMotto, getProfilePhoto, setMotto, setProfilePhoto } from "../models/Profile.js";
+import { formatMeasure, latestBodyLog } from "../models/Body.js";
 import { go } from "../routes.js";
 import { anyBorrowableCycle, openBorrowModal } from "./borrowModal.js";
 
@@ -27,6 +28,12 @@ export async function homeScreen() {
   const photoUrl = photo ? URL.createObjectURL(photo) : "";
   lastPhotoUrl = photoUrl;
   const motto = getMotto();
+  const latestBody = latestBodyLog();
+  const measureLabel = latestBody
+    ? latestBody.weight_kg != null
+      ? `Medidas · ${formatMeasure(latestBody.weight_kg)} kg`
+      : "Ver minhas medidas"
+    : "Anotar minhas medidas";
   const map = heatmapDays(35);
 
   return {
@@ -49,12 +56,15 @@ export async function homeScreen() {
                 <span class="sr-only">Frase de efeito</span>
                 <textarea id="motto" maxlength="120" rows="2">${escapeHtml(motto)}</textarea>
               </label>
+              <button type="button" class="btn btn-ghost medidas-home" data-go="/medidas">
+                ${icons.ruler} ${escapeHtml(measureLabel)}
+              </button>
             </div>
             <input id="photo-file" type="file" accept="image/*" hidden />
           </article>
 
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 025</div>
+            <div class="kicker"><span class="dot"></span> Versão 026</div>
             <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan

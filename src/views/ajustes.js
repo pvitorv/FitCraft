@@ -42,16 +42,16 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Banco local</strong>
-            <p class="muted">SQLite no aparelho — planos, ciclos e exercícios</p>
+            <p class="muted">Cópia no aparelho — planos, playlists e medidas sobrevivem à atualização</p>
           </div>
           <strong>OK</strong>
         </div>
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 025 — playlist vai com o áudio</p>
+            <p class="muted">FitCraft 026 — dados no aparelho e medidas do corpo</p>
           </div>
-          <strong>025</strong>
+          <strong>026</strong>
         </div>
       </div>
     `,

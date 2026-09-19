@@ -15,6 +15,7 @@ import { ajustesScreen } from "./views/ajustes.js";
 import { financeiroScreen } from "./views/financeiro.js";
 import { nutricaoScreen } from "./views/nutricao.js";
 import { maisScreen } from "./views/mais.js";
+import { medidasScreen } from "./views/medidas.js";
 import { bindIncomingFitcraft } from "./services/incomingPack.js";
 
 const screens = {
@@ -29,6 +30,7 @@ const screens = {
   financeiro: financeiroScreen,
   nutricao: nutricaoScreen,
   mais: maisScreen,
+  medidas: medidasScreen,
 };
 
 let lastPath = "";

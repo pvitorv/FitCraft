@@ -1613,6 +1613,51 @@ textarea.exercise-name {
   margin-top: 16px;
 }
 
+.measure-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.measure-grid .field.is-wide {
+  grid-column: 1 / -1;
+}
+
+.delta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.delta-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.delta-chip.is-down {
+  color: var(--ok);
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.delta-chip.is-up {
+  color: var(--yellow);
+  border-color: rgba(255, 212, 0, 0.35);
+}
+
+.medidas-home {
+  margin-top: 10px;
+  width: 100%;
+  justify-content: flex-start;
+}
+
 .expense-side {
   display: grid;
   justify-items: end;

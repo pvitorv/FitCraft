@@ -96,6 +96,23 @@ export function migrate(database) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_meals_day ON meals(day_date);
+
+    CREATE TABLE IF NOT EXISTS body_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      taken_on TEXT NOT NULL,
+      weight_kg REAL,
+      height_cm REAL,
+      chest_cm REAL,
+      waist_cm REAL,
+      hip_cm REAL,
+      arm_cm REAL,
+      thigh_cm REAL,
+      neck_cm REAL,
+      fat_percent REAL,
+      note TEXT NOT NULL DEFAULT ''
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_body_logs_date ON body_logs(taken_on);
   `);
 
   if (!columnNames(database, "cycles").includes("rounds")) {

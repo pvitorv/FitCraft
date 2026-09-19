@@ -17,6 +17,13 @@ export async function maisScreen() {
           </div>
           ${icons.music}
         </button>
+        <button class="row" data-go="/medidas">
+          <div>
+            <strong>Minhas medidas</strong>
+            <p class="muted">Peso, cintura e o ponto de partida do corpo.</p>
+          </div>
+          ${icons.ruler}
+        </button>
         <button class="row" data-go="/planos">
           <div>
             <strong>Planos de treino</strong>
