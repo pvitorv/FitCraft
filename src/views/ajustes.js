@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 018 — progresso, nutrição e gastos</p>
+            <p class="muted">FitCraft 019 — fundo azul, cards amarelos</p>
           </div>
-          <strong>018</strong>
+          <strong>019</strong>
         </div>
       </div>
     `,

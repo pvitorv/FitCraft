@@ -6,20 +6,21 @@
 @import "@fontsource/dm-sans/700.css";
 
 :root {
-  --bg: #09090b;
-  --bg-elevated: #111113;
-  --surface: #18181b;
-  --surface-2: #1f1f23;
-  --line: rgba(255, 255, 255, 0.08);
-  --text: #f5f5f4;
-  --muted: #a8a29e;
-  --faint: #78716c;
+  --bg: #070b16;
+  --bg-elevated: #0c1220;
+  --surface: #121a2c;
+  --surface-2: #182338;
+  --line: rgba(160, 190, 255, 0.12);
+  --text: #f3f6ff;
+  --muted: #9aa8c7;
+  --faint: #6d7a99;
   --yellow: #ffd400;
   --yellow-dim: #5a4800;
   --red: #ff1a1a;
   --red-dim: #6b0c0c;
-  --blue: #1f5cff;
-  --blue-dim: #0d2470;
+  --blue: #4d8dff;
+  --blue-dim: #12306e;
+  --blue-soft: #9ec5ff;
   --amber: var(--yellow);
   --amber-dim: var(--yellow-dim);
   --train: var(--red);
@@ -51,9 +52,9 @@ body {
   max-width: 100%;
   overflow-x: clip;
   background:
-    radial-gradient(1100px 480px at 8% -12%, rgba(255, 212, 0, 0.22), transparent 52%),
-    radial-gradient(900px 420px at 108% 0%, rgba(255, 26, 26, 0.2), transparent 48%),
-    radial-gradient(700px 360px at 70% 110%, rgba(31, 92, 255, 0.18), transparent 46%),
+    radial-gradient(1100px 520px at 10% -16%, rgba(90, 168, 255, 0.36), transparent 56%),
+    radial-gradient(820px 460px at 108% 4%, rgba(37, 80, 220, 0.30), transparent 52%),
+    radial-gradient(640px 340px at 72% 118%, rgba(77, 141, 255, 0.18), transparent 48%),
     var(--bg);
 }
 
@@ -128,9 +129,9 @@ button {
 }
 
 .version-chip {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
+  border: 1px solid rgba(77, 141, 255, 0.35);
+  background: var(--blue-dim);
+  color: var(--blue-soft);
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 0.75rem;
@@ -160,7 +161,7 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--amber);
+  color: var(--blue-soft);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -171,8 +172,8 @@ button {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--amber);
-  box-shadow: 0 0 0 4px var(--amber-dim);
+  background: var(--blue);
+  box-shadow: 0 0 0 4px var(--blue-dim);
 }
 
 .hero h2,
@@ -326,7 +327,7 @@ button {
   place-items: center;
   background: var(--surface);
   border: 1px solid var(--line);
-  color: var(--amber);
+  color: var(--blue-soft);
 }
 
 .empty h3 {
@@ -547,8 +548,8 @@ button {
 }
 
 .nav-btn.active {
-  color: var(--text);
-  background: var(--surface);
+  color: var(--blue-soft);
+  background: rgba(77, 141, 255, 0.16);
 }
 
 .list {
@@ -595,12 +596,12 @@ button {
 }
 
 .switch.is-on {
-  background: var(--yellow);
+  background: var(--blue);
 }
 
 .switch.is-on::after {
   transform: translateX(18px);
-  background: #1a1400;
+  background: #eaf2ff;
 }
 
 .row.plan-row,
@@ -815,8 +816,8 @@ button.row {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #1a1400;
-  background: rgba(255, 212, 0, 0.92);
+  color: #eaf2ff;
+  background: rgba(77, 141, 255, 0.92);
 }
 
 .profile-copy h2 {
@@ -1530,12 +1531,12 @@ textarea.exercise-name {
 .heat-cell {
   aspect-ratio: 1;
   border-radius: 6px;
-  background: #1f1f23;
+  background: #10182a;
 }
 
-.heat-cell.is-1 { background: #5a4800; }
-.heat-cell.is-2 { background: #ffd400; }
-.heat-cell.is-3 { background: #ff1a1a; }
+.heat-cell.is-1 { background: #12306e; }
+.heat-cell.is-2 { background: #4d8dff; }
+.heat-cell.is-3 { background: #93c5ff; }
 
 .stack-bar {
   display: flex;
