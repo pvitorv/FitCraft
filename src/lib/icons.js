@@ -20,4 +20,5 @@ export const icons = {
   pause: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 6h3.5v12H7zM13.5 6H17v12h-3.5z"/></svg>`,
   next: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 7v10l8-5zM17 7v10"/></svg>`,
   camera: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg>`,
+  share: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="2.2"/><circle cx="17" cy="6" r="2.2"/><circle cx="17" cy="18" r="2.2"/><path d="M8 11.2 15 7.2M8 12.8l7 4"/></svg>`,
 };

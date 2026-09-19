@@ -1,10 +1,13 @@
 import { daysLabel } from "../lib/cycleNames.js";
+import { isAbortError } from "../lib/cyclePack.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { activatePlan, createPlan, deletePlan, findPlan, listPlans, renamePlan } from "../models/Plan.js";
 import { cycleDayIndex } from "../lib/calendar.js";
 import { cycleRounds, listCycles } from "../models/Cycle.js";
 import { go } from "../routes.js";
+import { shareOrSaveCycle } from "../services/shareCycle.js";
+import { importCycleFromFile } from "./importCycleModal.js";
 
 export async function planosScreen() {
   const plans = listPlans();
@@ -17,6 +20,7 @@ export async function planosScreen() {
         <p>Um ciclo por dia. Semanal, quinzenal ou mensal — tudo gravado no SQLite.</p>
         <div class="cta-row">
           <button class="btn btn-primary" data-go="/planos/novo">${icons.plus} Novo plano</button>
+          <button class="btn btn-ghost" type="button" id="import-cycle">${icons.share} Receber um ciclo</button>
         </div>
       </article>
       ${
@@ -43,6 +47,11 @@ export async function planosScreen() {
             </div>`
       }
     `,
+    bind(root) {
+      root.querySelector("#import-cycle")?.addEventListener("click", () => {
+        importCycleFromFile();
+      });
+    },
   };
 }
 
@@ -163,9 +172,19 @@ export async function planoScreen({ id }) {
                     <strong>${escapeHtml(cycle.name)}${cycle.day_index === todayIndex ? " · hoje" : ""}</strong>
                     <p class="muted">${cycle.exercise_count} exercício${cycle.exercise_count === 1 ? "" : "s"} · ${cycleRounds(cycle)}× · prep ${cycle.prep_seconds}s · intervalo ${cycle.rest_seconds}s</p>
                   </div>
-                  <button class="btn btn-ghost" type="button" data-go="/planos/${plan.id}/ciclos/${cycle.id}">
-                    ${icons.edit} Editar
-                  </button>
+                  <div class="cycle-actions">
+                    <button class="btn btn-ghost" type="button" data-go="/planos/${plan.id}/ciclos/${cycle.id}">
+                      ${icons.edit} Editar
+                    </button>
+                    <button
+                      class="btn btn-ghost"
+                      type="button"
+                      data-share-cycle="${cycle.id}"
+                      ${cycle.exercise_count ? "" : "disabled"}
+                    >
+                      ${icons.share} Enviar
+                    </button>
+                  </div>
                 </div>
               </li>
             `,
@@ -197,6 +216,20 @@ export async function planoScreen({ id }) {
         if (!ok) return;
         deletePlan(plan.id);
         go("/planos");
+      });
+
+      root.querySelectorAll("[data-share-cycle]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          try {
+            const result = await shareOrSaveCycle(Number(button.dataset.shareCycle));
+            if (result === "downloaded") {
+              alert("Arquivo .fitcraft salvo. Envie por WhatsApp, e-mail ou Drive.");
+            }
+          } catch (error) {
+            if (isAbortError(error)) return;
+            alert(error.message);
+          }
+        });
       });
     },
   };

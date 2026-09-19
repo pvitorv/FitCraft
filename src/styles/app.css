@@ -567,6 +567,13 @@ button {
   border: 1px solid var(--line);
 }
 
+.row > svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--faint);
+}
+
 .switch {
   width: 46px;
   height: 28px;
@@ -861,8 +868,11 @@ button.row {
   border: 1px solid var(--line);
 }
 
-.cycle-link .btn {
+.cycle-link .cycle-actions {
   grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .cycle-link svg {
@@ -1392,8 +1402,9 @@ textarea.exercise-name {
     grid-template-columns: 52px minmax(0, 1fr) auto;
   }
 
-  .cycle-link .btn {
+  .cycle-link .cycle-actions {
     grid-column: auto;
+    grid-template-columns: auto auto;
   }
 }
 

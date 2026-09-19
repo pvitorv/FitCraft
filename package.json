@@ -11,6 +11,8 @@
   "dependencies": {
     "@capacitor/android": "^7.4.3",
     "@capacitor/core": "^7.4.3",
+    "@capacitor/filesystem": "^7.1.8",
+    "@capacitor/share": "^7.0.4",
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/outfit": "^5.2.8",
     "sql.js": "^1.14.2"

@@ -1,4 +1,6 @@
 import { getSetting, setSetting } from "../models/Setting.js";
+import { icons } from "../lib/icons.js";
+import { importCycleFromFile } from "./importCycleModal.js";
 
 function switchClass(on) {
   return on ? "switch is-on" : "switch";
@@ -30,6 +32,13 @@ export async function ajustesScreen() {
           </div>
           <div class="${switchClass(beepOn)}" aria-hidden="true"></div>
         </button>
+        <button class="row" type="button" id="import-cycle">
+          <div>
+            <strong>Receber um ciclo</strong>
+            <p class="muted">Abre um arquivo .fitcraft e coloca no dia que você escolher.</p>
+          </div>
+          ${icons.share}
+        </button>
         <div class="row">
           <div>
             <strong>Banco local</strong>
@@ -40,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 014 — calendário, foto e frase</p>
+            <p class="muted">FitCraft 015 — arquivo .fitcraft para enviar um ciclo</p>
           </div>
-          <strong>014</strong>
+          <strong>015</strong>
         </div>
       </div>
     `,
@@ -54,6 +63,10 @@ export async function ajustesScreen() {
           setSetting(key, next);
           button.querySelector(".switch").classList.toggle("is-on", next === "1");
         });
+      });
+
+      root.querySelector("#import-cycle")?.addEventListener("click", () => {
+        importCycleFromFile();
       });
     },
   };

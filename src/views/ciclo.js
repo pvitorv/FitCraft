@@ -12,9 +12,12 @@ import {
   setExerciseWork,
 } from "../models/Exercise.js";
 import { persistNow } from "../database/connection.js";
+import { isAbortError } from "../lib/cyclePack.js";
 import { findPlan } from "../models/Plan.js";
 import { flushEdits } from "../lib/flushEdits.js";
 import { go } from "../routes.js";
+import { shareOrSaveCycle } from "../services/shareCycle.js";
+import { importCycleFromFile } from "./importCycleModal.js";
 
 function stepper(kind, value, extra = "", format = "clock") {
   const shown = format === "clock" ? formatClock(value) : `${value}×`;
@@ -71,6 +74,10 @@ export async function cicloScreen({ id, cycleId }) {
         <p class="muted" data-cycle-duration>${durationCopy(cycle, exercises)}</p>
         <div class="cta-row">
           <button type="button" class="btn btn-primary" data-save-cycle>${icons.check} Salvar ciclo</button>
+          <button type="button" class="btn btn-ghost" data-share-cycle ${exercises.length ? "" : "disabled"}>
+            ${icons.share} Enviar .fitcraft
+          </button>
+          <button type="button" class="btn btn-ghost" data-import-cycle>${icons.plus} Receber neste dia</button>
         </div>
       </article>
 
@@ -304,6 +311,27 @@ export async function cicloScreen({ id, cycleId }) {
           });
           await persistNow();
           paintSaved();
+        });
+      });
+
+      root.querySelector("[data-share-cycle]")?.addEventListener("click", async () => {
+        flushEdits(root);
+        try {
+          const result = await shareOrSaveCycle(cycle.id);
+          if (result === "downloaded") {
+            alert("Arquivo .fitcraft salvo. Envie por WhatsApp, e-mail ou Drive.");
+          }
+        } catch (error) {
+          if (isAbortError(error)) return;
+          alert(error.message);
+        }
+      });
+
+      root.querySelector("[data-import-cycle]")?.addEventListener("click", () => {
+        flushEdits(root);
+        importCycleFromFile({
+          preferredCycleId: cycle.id,
+          onApplied: () => go(`/planos/${plan.id}/ciclos/${cycle.id}`),
         });
       });
     },
