@@ -5,6 +5,8 @@ import { formatClock } from "../lib/time.js";
 import { cycleRounds, firstCycle, firstTrainableCycle } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
 import { getActivePlan } from "../models/Plan.js";
+import { go } from "../routes.js";
+import { anyBorrowableCycle, openBorrowModal } from "./borrowModal.js";
 
 export async function homeScreen() {
   const plan = getActivePlan();
@@ -20,7 +22,7 @@ export async function homeScreen() {
       <section class="layout-split">
         <div>
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 009</div>
+            <div class="kicker"><span class="dot"></span> Versão 010</div>
             <h2>Seu cronômetro de treino metabólico.</h2>
             <p>${
               plan
@@ -30,6 +32,9 @@ export async function homeScreen() {
             <div class="cta-row">
               <button class="btn btn-primary" ${canTrain ? `data-go="/treino/${trainable.id}"` : "disabled"}>
                 Treinar hoje
+              </button>
+              <button class="btn btn-ghost" type="button" id="borrow-open" ${anyBorrowableCycle() ? "" : "disabled"}>
+                ${icons.swap} Aproveitar outro dia
               </button>
               <button class="btn btn-ghost" data-go="${plan ? `/planos/${plan.id}` : "/planos/novo"}">
                 ${plan ? "Abrir plano" : "Criar plano"}
@@ -78,5 +83,13 @@ export async function homeScreen() {
         </aside>
       </section>
     `,
+    bind(root) {
+      root.querySelector("#borrow-open")?.addEventListener("click", () => {
+        openBorrowModal({
+          currentCycleId: trainable?.id,
+          onPick: (cycle) => go(`/treino/${cycle.id}`),
+        });
+      });
+    },
   };
 }

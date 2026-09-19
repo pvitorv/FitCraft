@@ -1,13 +1,14 @@
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
 import { formatClock } from "../lib/time.js";
-import { findCycle, firstTrainableCycle, listCycles } from "../models/Cycle.js";
+import { findCycle, firstTrainableCycle } from "../models/Cycle.js";
 import { listExercises } from "../models/Exercise.js";
-import { getActivePlan } from "../models/Plan.js";
+import { findPlan, getActivePlan } from "../models/Plan.js";
 import { playCues, resetCues, unlockCues } from "../services/cues.js";
 import { cycleSignature, timerEngine } from "../services/timerEngine.js";
 import { keepAwake, releaseAwake } from "../services/wakeLock.js";
 import { go } from "../routes.js";
+import { anyBorrowableCycle, openBorrowModal } from "./borrowModal.js";
 
 let unsubscribe = null;
 
@@ -76,14 +77,12 @@ function paint(root, snapshot, exercises) {
 
 export async function treinoScreen(params) {
   const plan = getActivePlan();
-  const cycles = plan ? listCycles(plan.id) : [];
   const requested = params.cycleId ? findCycle(params.cycleId) : null;
-  const cycle =
-    requested && plan && requested.plan_id === plan.id
-      ? requested
-      : plan
-        ? firstTrainableCycle(plan.id)
-        : null;
+  const cycle = requested ?? (plan ? firstTrainableCycle(plan.id) : null);
+  const cyclePlan = cycle ? findPlan(cycle.plan_id) : null;
+  const planned = plan ? firstTrainableCycle(plan.id) : null;
+  const borrowedPlan = Boolean(cycle && plan && cycle.plan_id !== plan.id);
+  const borrowedDay = Boolean(cycle && planned && cycle.id !== planned.id);
   const exercises = cycle ? listExercises(cycle.id) : [];
 
   if (cycle) {
@@ -100,20 +99,16 @@ export async function treinoScreen(params) {
       ? `
         <div class="timer-wrap">
           <div class="timer-toolbar">
-            <label class="field compact">
-              <span>Ciclo de hoje</span>
-              <select id="cycle-pick">
-                ${cycles
-                  .map(
-                    (item) => `
-                      <option value="${item.id}" ${item.id === cycle.id ? "selected" : ""}>
-                        ${escapeHtml(item.name)} · ${item.exercise_count} ex.
-                      </option>
-                    `,
-                  )
-                  .join("")}
-              </select>
-            </label>
+            <div class="borrow-now">
+              <div>
+                <small>${borrowedPlan ? "Aproveitando" : borrowedDay ? "Aproveitando outro dia" : "Ciclo de hoje"}</small>
+                <strong>${escapeHtml(cycle.name)}</strong>
+                <p class="muted">${escapeHtml(cyclePlan?.name ?? "Plano")}${borrowedPlan ? " · fora do plano ativo" : ""}</p>
+              </div>
+              <button class="btn btn-ghost" type="button" id="borrow-open" ${anyBorrowableCycle() ? "" : "disabled"}>
+                ${icons.swap} Aproveitar outro dia
+              </button>
+            </div>
             <p class="muted" data-progress>Fase 1</p>
           </div>
           <section class="timer-stage is-prep" data-timer>
@@ -160,14 +155,18 @@ export async function treinoScreen(params) {
 
       unsubscribe = timerEngine.subscribe((snapshot) => paint(root, snapshot, exercises));
 
-      root.querySelector("#cycle-pick")?.addEventListener("change", (event) => {
-        const nextId = Number(event.target.value);
-        if (nextId === cycle.id) return;
-        if (timerEngine.snapshot().running) timerEngine.pause();
-        timerEngine.load(findCycle(nextId), listExercises(nextId));
-        resetCues();
-        releaseAwake();
-        go(`/treino/${nextId}`);
+      root.querySelector("#borrow-open")?.addEventListener("click", () => {
+        openBorrowModal({
+          currentCycleId: cycle.id,
+          onPick: (next) => {
+            if (next.id === cycle.id) return;
+            if (timerEngine.snapshot().running) timerEngine.pause();
+            timerEngine.load(findCycle(next.id), listExercises(next.id));
+            resetCues();
+            releaseAwake();
+            go(`/treino/${next.id}`);
+          },
+        });
       });
 
       root.querySelector("[data-main]")?.addEventListener("click", () => {

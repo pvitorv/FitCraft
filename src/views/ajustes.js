@@ -40,9 +40,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 009 — tempo sem pular a tela</p>
+            <p class="muted">FitCraft 010 — aproveitar outro dia</p>
           </div>
-          <strong>009</strong>
+          <strong>010</strong>
         </div>
       </div>
     `,
