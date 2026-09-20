@@ -10,3 +10,7 @@ dist/
 .vscode/
 *.apk
 *.aab
+signing/*.p12
+signing/*.jks
+signing/*.keystore
+signing/vendor.local.mjs

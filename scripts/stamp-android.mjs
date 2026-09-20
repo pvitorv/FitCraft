@@ -1,19 +1,13 @@
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const version = readFileSync(join(root, "VERSION"), "utf8").trim();
 const versionCode = Number(version);
-const vendor = "CriaSysWeb / Paulo Vitor Vaz";
-const vendorAddress = "REDACTED";
-const vendorPhone = "REDACTED";
-const vendorEmail = "REDACTED";
-const vendorDescription = `FitCraft. Fornecedor: ${vendor}. ${vendorAddress}. Fone: ${vendorPhone}. E-mail: ${vendorEmail}.`;
-const storePassword = "REDACTED";
 
 function xmlText(value) {
-  return value
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -21,8 +15,46 @@ function xmlText(value) {
     .replaceAll("'", "&apos;");
 }
 
+async function loadVendor() {
+  const fromEnv = {
+    vendor: process.env.FITCRAFT_VENDOR,
+    vendorAddress: process.env.FITCRAFT_VENDOR_ADDRESS || "",
+    vendorPhone: process.env.FITCRAFT_VENDOR_PHONE || "",
+    vendorEmail: process.env.FITCRAFT_VENDOR_EMAIL || "",
+    storePassword: process.env.FITCRAFT_STORE_PASSWORD,
+    keyAlias: process.env.FITCRAFT_KEY_ALIAS || "fitcraft",
+  };
+  if (fromEnv.vendor && fromEnv.storePassword) return fromEnv;
+
+  const localPath = join(root, "signing", "vendor.local.mjs");
+  if (!existsSync(localPath)) {
+    throw new Error(
+      "Faltam os dados de assinatura. Copie signing/vendor.example.mjs para signing/vendor.local.mjs e preencha. No GitHub Actions, cadastre os Secrets (veja o README).",
+    );
+  }
+  return import(pathToFileURL(localPath).href);
+}
+
+const identity = await loadVendor();
+const vendor = identity.vendor;
+const vendorAddress = "REDACTED";
+const vendorPhone = identity.vendorPhone || "";
+const vendorEmail = identity.vendorEmail || "";
+const storePassword = identity.storePassword;
+const keyAlias = identity.keyAlias || "fitcraft";
+
+if (!vendor || !storePassword) {
+  throw new Error("vendor e storePassword são obrigatórios em vendor.local.mjs ou nos Secrets.");
+}
+
+const vendorDescription = `FitCraft. Fornecedor: ${vendor}. ${vendorAddress}. Fone: ${vendorPhone}. E-mail: ${vendorEmail}.`;
+const p12Source = join(root, "signing", "fitcraft.p12");
+if (!existsSync(p12Source)) {
+  throw new Error("Falta signing/fitcraft.p12. Esse arquivo não vai para o Git. No Actions ele é recriado a partir do Secret FITCRAFT_P12_BASE64.");
+}
+
 const appDir = join(root, "android", "app");
-copyFileSync(join(root, "signing", "fitcraft.p12"), join(appDir, "fitcraft.p12"));
+copyFileSync(p12Source, join(appDir, "fitcraft.p12"));
 
 const gradlePath = join(appDir, "build.gradle");
 let gradle = readFileSync(gradlePath, "utf8");
@@ -35,7 +67,7 @@ if (!gradle.includes("signingConfigs")) {
         vendor {
             storeFile file("fitcraft.p12")
             storePassword "${storePassword}"
-            keyAlias "fitcraft"
+            keyAlias "${keyAlias}"
             keyPassword "${storePassword}"
             storeType "PKCS12"
         }

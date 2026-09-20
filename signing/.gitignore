@@ -1,2 +1,6 @@
 *.pem
 *.key
+*.p12
+*.jks
+*.keystore
+vendor.local.mjs

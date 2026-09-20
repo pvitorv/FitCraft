@@ -45,7 +45,24 @@ jobs:
       - name: Sincronizar web no Android
         run: npx cap sync android
 
+      - name: Restaurar certificado de assinatura
+        env:
+          FITCRAFT_P12_BASE64: ${{ secrets.FITCRAFT_P12_BASE64 }}
+        run: |
+          if [ -z "$FITCRAFT_P12_BASE64" ]; then
+            echo "Cadastre o Secret FITCRAFT_P12_BASE64 (certificado em base64)."
+            exit 1
+          fi
+          echo "$FITCRAFT_P12_BASE64" | base64 -d > signing/fitcraft.p12
+
       - name: Identidade do fornecedor no APK
+        env:
+          FITCRAFT_VENDOR: ${{ secrets.FITCRAFT_VENDOR }}
+          FITCRAFT_VENDOR_ADDRESS: ${{ secrets.FITCRAFT_VENDOR_ADDRESS }}
+          FITCRAFT_VENDOR_PHONE: ${{ secrets.FITCRAFT_VENDOR_PHONE }}
+          FITCRAFT_VENDOR_EMAIL: ${{ secrets.FITCRAFT_VENDOR_EMAIL }}
+          FITCRAFT_STORE_PASSWORD: ${{ secrets.FITCRAFT_STORE_PASSWORD }}
+          FITCRAFT_KEY_ALIAS: ${{ secrets.FITCRAFT_KEY_ALIAS }}
         run: node scripts/stamp-android.mjs
 
       - name: Compilar APK

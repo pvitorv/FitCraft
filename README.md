@@ -8,6 +8,8 @@ Ele marca o tempo do seu treino em três fases: **preparação** (amarelo), **tr
 
 Versão atual: **027**.
 
+Licença: **uso pessoal**. Não pode vender nem usar de forma comercial. Se copiar ou modificar, a cópia tem que ficar com **esta mesma licença**. Detalhes no arquivo [LICENSE](LICENSE).
+
 ---
 
 ## O que o FitCraft faz
@@ -288,3 +290,17 @@ npm run dev
 ```
 
 Abre `http://localhost:5173` no Chrome. É só o visual; o APK do celular é o que vale no dia a dia.
+
+Para **gerar o APK**, o certificado e os dados do fornecedor **não estão neste repositório**. Copie `signing/vendor.example.mjs` para `signing/vendor.local.mjs`, preencha, e coloque o arquivo `signing/fitcraft.p12` na mesma pasta. No GitHub Actions isso vai em **Settings → Secrets and variables → Actions**.
+
+---
+
+## Licença
+
+O FitCraft usa a licença **Creative Commons Attribution-NonCommercial-ShareAlike 4.0** (CC BY-NC-SA 4.0).
+
+- Pode usar e adaptar **para você**
+- **Não pode comercializar** (vender o app, cobrar pelo APK, usar em produto pago)
+- Se publicar uma versão modificada, ela **tem que usar esta mesma licença** e manter os créditos
+
+O texto está em [LICENSE](LICENSE).
