@@ -37,7 +37,7 @@ async function loadVendor() {
 
 const identity = await loadVendor();
 const vendor = identity.vendor;
-const vendorAddress = "REDACTED";
+const vendorAddress = identity.vendorAddress || "";
 const vendorPhone = identity.vendorPhone || "";
 const vendorEmail = identity.vendorEmail || "";
 const storePassword = identity.storePassword;
