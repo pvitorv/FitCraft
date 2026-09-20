@@ -2,8 +2,8 @@ import { daysLabel } from "../lib/cycleNames.js";
 import { isAbortError } from "../lib/cyclePack.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
-import { activatePlan, createPlan, deletePlan, findPlan, listPlans, renamePlan } from "../models/Plan.js";
-import { WEEKDAYS, cycleDayIndex } from "../lib/calendar.js";
+import { activatePlan, createPlan, deletePlan, findPlan, listPlans, renamePlan, restartPlan } from "../models/Plan.js";
+import { WEEKDAYS, cycleDayIndex, cyclePosition } from "../lib/calendar.js";
 import { cycleRounds, listCycles } from "../models/Cycle.js";
 import { go } from "../routes.js";
 import { shareOrSaveCycle } from "../services/shareCycle.js";
@@ -17,7 +17,7 @@ export async function planosScreen() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Planos</div>
         <h2>7, 14 ou 28 ciclos.</h2>
-        <p>Semanas inteiras, de domingo a sábado. Semanal, 2 semanas ou 4 semanas — tudo gravado no SQLite.</p>
+        <p>Semanas inteiras, de domingo a sábado. 7, 14 ou 28 dias. No fim a sequência recomeça — os exercícios ficam.</p>
         <div class="cta-row">
           <button class="btn btn-primary" data-go="/planos/novo">${icons.plus} Novo plano</button>
           <button class="btn btn-ghost" type="button" id="import-cycle">${icons.share} Receber um ciclo</button>
@@ -62,7 +62,7 @@ export async function planoNovoScreen() {
       <article class="hero">
         <div class="kicker"><span class="dot"></span> Novo plano</div>
         <h2>Quantos dias você vai treinar?</h2>
-        <p>O app cria um ciclo para cada dia. 7, 14 ou 28 — sempre semanas fechadas, domingo a sábado.</p>
+        <p>O app cria um ciclo para cada dia. O plano de 14 ou 28 começa no domingo desta semana. Quando acaba, os exercícios continuam e a sequência volta do dia 1.</p>
       </article>
       <form class="stack" id="plan-form">
         <label class="field">
@@ -140,7 +140,9 @@ export async function planoScreen({ id }) {
   }
 
   const cycles = listCycles(plan.id);
-  const todayIndex = cycleDayIndex(plan.days_count);
+  const todayIndex = cycleDayIndex(plan.days_count, new Date(), plan.starts_on);
+  const position = cyclePosition(plan.days_count, new Date(), plan.starts_on);
+  const longPlan = plan.days_count > 7;
 
   return {
     html: `
@@ -151,12 +153,21 @@ export async function planoScreen({ id }) {
           <span class="sr-only">Nome do plano</span>
           <input id="plan-name" data-plan-id="${plan.id}" maxlength="40" value="${escapeHtml(plan.name)}" />
         </label>
-        <p>Abra um dia para montar os exercícios e os tempos de preparação, treino e intervalo.</p>
+        <p>${
+          longPlan
+            ? `Hoje é o dia ${position.number} de ${position.total}, semana ${position.week}. No fim os exercícios ficam e a sequência volta do domingo 1. Se o dia estiver errado, recomece a partir deste domingo.`
+            : "Toda semana são os mesmos 7 dias, de domingo a sábado. Nada se apaga quando a semana acaba."
+        }</p>
         <div class="cta-row">
           ${
             plan.active
               ? `<span class="badge">Plano ativo</span>`
               : `<button class="btn btn-primary" type="button" id="activate-plan">Usar este plano</button>`
+          }
+          ${
+            longPlan
+              ? `<button class="btn btn-ghost" type="button" id="restart-plan">Recomeçar neste domingo</button>`
+              : ""
           }
           <button class="btn btn-danger" type="button" id="delete-plan">${icons.trash} Apagar</button>
         </div>
@@ -208,6 +219,15 @@ export async function planoScreen({ id }) {
 
       root.querySelector("#activate-plan")?.addEventListener("click", () => {
         activatePlan(plan.id);
+        go(`/planos/${plan.id}`);
+      });
+
+      root.querySelector("#restart-plan")?.addEventListener("click", () => {
+        const ok = window.confirm(
+          "Recomeçar a partir deste domingo? Os exercícios continuam. O dia 1 volta a ser o domingo desta semana.",
+        );
+        if (!ok) return;
+        restartPlan(plan.id);
         go(`/planos/${plan.id}`);
       });
 

@@ -32,7 +32,7 @@ export function firstTrainableCycle(planId) {
 export function cycleForToday(plan, date = new Date()) {
   if (!plan) return null;
   const cycles = listCycles(plan.id);
-  const index = cycleDayIndex(plan.days_count, date);
+  const index = cycleDayIndex(plan.days_count, date, plan.starts_on);
   return cycles.find((cycle) => cycle.day_index === index) ?? firstCycle(plan.id);
 }
 

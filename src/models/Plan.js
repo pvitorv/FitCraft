@@ -1,4 +1,5 @@
 import { all, get, lastId, run } from "../database/connection.js";
+import { isoDate, startOfWeek } from "../lib/calendar.js";
 import { PLAN_DAYS, defaultCycleNames } from "../lib/cycleNames.js";
 import { deleteExercisesForPlan } from "./Exercise.js";
 import { getActivePlanId, setActivePlanId } from "./Setting.js";
@@ -32,8 +33,8 @@ export function createPlan(name, daysCount) {
   }
 
   run(
-    "INSERT INTO plans (name, days_count, created_at) VALUES (?, ?, ?)",
-    [trimmed, daysCount, new Date().toISOString()],
+    "INSERT INTO plans (name, days_count, created_at, starts_on) VALUES (?, ?, ?, ?)",
+    [trimmed, daysCount, new Date().toISOString(), isoDate(startOfWeek(new Date()))],
   );
 
   const id = lastId();
@@ -78,6 +79,14 @@ export function deletePlan(id) {
     const next = get("SELECT id FROM plans ORDER BY id DESC LIMIT 1");
     setActivePlanId(next ? next.id : null);
   }
+}
+
+export function restartPlan(id) {
+  if (!findPlan(id)) {
+    throw new Error("Plano não encontrado.");
+  }
+  run("UPDATE plans SET starts_on = ? WHERE id = ?", [isoDate(startOfWeek(new Date())), id]);
+  return findPlan(id);
 }
 
 export function getActivePlan() {

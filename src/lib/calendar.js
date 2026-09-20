@@ -31,15 +31,31 @@ function utcDayNumber(date) {
   return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
 }
 
-const WEEK_ORIGIN = utcDayNumber(new Date(2026, 8, 13));
+function asDate(value) {
+  if (value instanceof Date) return value;
+  if (typeof value === "string" && value) return parseIsoDate(value.slice(0, 10));
+  return new Date();
+}
 
-export function cycleDayIndex(daysCount, date = new Date()) {
+export function cycleDayIndex(daysCount, date = new Date(), origin = null) {
   const weekday = weekdayIndex(date);
   const weeks = Math.max(1, Math.round(Number(daysCount) / 7));
   if (weeks <= 1) return weekday;
-  const weekNum = Math.round((utcDayNumber(startOfWeek(date)) - WEEK_ORIGIN) / 7);
+  const originWeek = utcDayNumber(startOfWeek(asDate(origin || date)));
+  const thisWeek = utcDayNumber(startOfWeek(date));
+  const weekNum = Math.round((thisWeek - originWeek) / 7);
   const slot = ((weekNum % weeks) + weeks) % weeks;
   return slot * 7 + weekday;
+}
+
+export function cyclePosition(daysCount, date = new Date(), origin = null) {
+  const index = cycleDayIndex(daysCount, date, origin);
+  return {
+    index,
+    number: index + 1,
+    total: Number(daysCount),
+    week: Math.floor(index / 7) + 1,
+  };
 }
 
 export function greeting(date = new Date()) {

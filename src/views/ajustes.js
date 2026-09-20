@@ -49,9 +49,9 @@ export async function ajustesScreen() {
         <div class="row">
           <div>
             <strong>Versão instalada</strong>
-            <p class="muted">FitCraft 026 — dados no aparelho e medidas do corpo</p>
+            <p class="muted">FitCraft 027 — o ciclo de 14 e 28 dias começa neste domingo</p>
           </div>
-          <strong>026</strong>
+          <strong>027</strong>
         </div>
       </div>
     `,

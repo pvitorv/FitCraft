@@ -14,7 +14,8 @@ export function migrate(database) {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       days_count INTEGER NOT NULL CHECK (days_count IN (7, 14, 28)),
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      starts_on TEXT
     );
 
     CREATE TABLE IF NOT EXISTS cycles (
@@ -129,6 +130,7 @@ export function migrate(database) {
 
   rotateSevenDayPlansToSundayFirst(database);
   convertPlansToWeekBlocks(database);
+  fillPlanStartsOn(database);
 }
 
 function settingValue(database, key) {
@@ -207,4 +209,19 @@ function convertPlansToWeekBlocks(database) {
   }
 
   database.run("INSERT OR REPLACE INTO settings (key, value) VALUES ('week_blocks_14_28', '1')");
+}
+
+function sundayIso(date = new Date()) {
+  const sunday = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay());
+  const year = sunday.getFullYear();
+  const month = String(sunday.getMonth() + 1).padStart(2, "0");
+  const day = String(sunday.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function fillPlanStartsOn(database) {
+  if (!columnNames(database, "plans").includes("starts_on")) {
+    database.run("ALTER TABLE plans ADD COLUMN starts_on TEXT");
+  }
+  database.run("UPDATE plans SET starts_on = ? WHERE starts_on IS NULL OR starts_on = ''", [sundayIso()]);
 }

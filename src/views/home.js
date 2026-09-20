@@ -1,4 +1,4 @@
-import { nowParts, WEEKDAYS } from "../lib/calendar.js";
+import { nowParts, WEEKDAYS, cyclePosition } from "../lib/calendar.js";
 import { barChart, heatMap } from "../lib/charts.js";
 import { escapeHtml } from "../lib/html.js";
 import { icons } from "../lib/icons.js";
@@ -35,6 +35,7 @@ export async function homeScreen() {
       : "Ver minhas medidas"
     : "Anotar minhas medidas";
   const map = heatmapDays(35);
+  const position = plan ? cyclePosition(plan.days_count, now.date, plan.starts_on) : null;
 
   return {
     html: `
@@ -64,11 +65,13 @@ export async function homeScreen() {
           </article>
 
           <article class="hero">
-            <div class="kicker"><span class="dot"></span> Versão 026</div>
+            <div class="kicker"><span class="dot"></span> Versão 027</div>
             <h2>${cycle ? `Hoje é ${escapeHtml(cycle.name)}.` : "Seu cronômetro de treino metabólico."}</h2>
             <p>${
               plan
-                ? `Plano ativo: <strong>${escapeHtml(plan.name)}</strong> · o app abre o ciclo de ${escapeHtml(now.weekdayName.toLowerCase())}, ${escapeHtml(now.clock)}. Reaproveitar outro dia é escolha sua.`
+                ? plan.days_count > 7
+                  ? `Plano ativo: <strong>${escapeHtml(plan.name)}</strong> · dia ${position.number} de ${position.total}, semana ${position.week}. Quando acaba, os exercícios ficam e a sequência volta do dia 1.`
+                  : `Plano ativo: <strong>${escapeHtml(plan.name)}</strong> · o app abre o ciclo de ${escapeHtml(now.weekdayName.toLowerCase())}, ${escapeHtml(now.clock)}. Toda semana os mesmos 7 dias — nada se apaga.`
                 : "Crie um plano de 7, 14 ou 28 ciclos. Os dados ficam no SQLite deste aparelho."
             }</p>
             <div class="cta-row">
